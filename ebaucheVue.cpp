@@ -1,45 +1,60 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "Niveau.hpp"
 
 int main()
 {
 
 	// Parametres graphiques, à replacer au bon endroit
-	int MARGIN_LEFT = 100, MARGIN_RIGHT = 100, MARGIN_TOP = 100, MARGIN_BOTTOM = 100;
+	// int MARGIN_LEFT = 100, MARGIN_RIGHT = 100, MARGIN_TOP = 100, MARGIN_BOTTOM = 100;
+	int MARGIN_LEFT = 100, MARGIN_TOP = 100;
 	int TILE_SIZE = 64;
-	int NB_COL = 8, NB_LIGNE = 10;
-	unsigned int nbPix_x = MARGIN_LEFT + MARGIN_RIGHT + NB_COL * TILE_SIZE;
-	unsigned int nbPix_y = MARGIN_TOP + MARGIN_BOTTOM + NB_LIGNE * TILE_SIZE;
+	int NB_COL = 8, NB_LIGNE = 7;
+	unsigned int nbPix_x = 1000, nbPix_y = 1000; // TODO
+
+	sf::RenderWindow window{sf::VideoMode{nbPix_x, nbPix_y}, "Piece Out"};
+	std::vector<int> data0 = {
+		1,1,1,1,1,1,1,1,
+		1,1,0,1,1,0,1,1,
+		1,1,1,1,1,1,1,1,
+		1,0,1,1,1,1,0,1,
+		1,0,1,1,1,1,0,1,
+		1,1,0,0,0,0,1,1,
+		1,1,1,1,1,1,1,1,
+	};
+	std::vector<Niveau*> niveaux{new Niveau{NB_COL, NB_LIGNE, data0}};
+	AfficheurNiveau afficheurNiveau{window, niveaux};
+	afficheurNiveau.dessiner();
 
     // définition d'un panneau "central"
     sf::RectangleShape centralPane(sf::Vector2f(NB_COL * TILE_SIZE, NB_LIGNE * TILE_SIZE));
 	centralPane.setPosition(MARGIN_LEFT, MARGIN_TOP);
 	centralPane.setFillColor(sf::Color::Cyan);
 
-	// plus une trame (lignes horizontales + verticales). En SFML on peut passer par VertexArray
-	// Lines est une sf::enum, VertexArray encapsule autant de points que nécessaires pour ces lignes
-	sf::VertexArray trame(sf::Lines, (NB_COL+1 + NB_LIGNE+1) * 2); 
-	// pour les lignes horizontales
-	int n = 0;
-	for (int i = 0; i <= NB_LIGNE; ++i)
-	{
-		trame[n++].position = sf::Vector2f(MARGIN_LEFT, MARGIN_TOP + i*TILE_SIZE);
-		trame[n].color = sf::Color::Blue;
-		trame[n++].position = sf::Vector2f(nbPix_x - MARGIN_RIGHT, MARGIN_TOP + i*TILE_SIZE);
-	}
-	// pour les verticales
-	for (int i = 0; i <= NB_COL; ++i)
-	{
-		trame[n++].position = sf::Vector2f(MARGIN_LEFT + i*TILE_SIZE, MARGIN_TOP );
-		trame[n].color = sf::Color::Blue;
-		trame[n++].position = sf::Vector2f(MARGIN_LEFT + i*TILE_SIZE, nbPix_y - MARGIN_BOTTOM);
-	}
+	// // plus une trame (lignes horizontales + verticales). En SFML on peut passer par VertexArray
+	// // Lines est une sf::enum, VertexArray encapsule autant de points que nécessaires pour ces lignes
+	// sf::VertexArray trame(sf::Lines, (NB_COL+1 + NB_LIGNE+1) * 2); 
+	// // pour les lignes horizontales
+	// int n = 0;
+	// for (int i = 0; i <= NB_LIGNE; ++i)
+	// {
+	// 	trame[n++].position = sf::Vector2f(MARGIN_LEFT, MARGIN_TOP + i*TILE_SIZE);
+	// 	trame[n].color = sf::Color::Blue;
+	// 	trame[n++].position = sf::Vector2f(nbPix_x - MARGIN_RIGHT, MARGIN_TOP + i*TILE_SIZE);
+	// }
+	// // pour les verticales
+	// for (int i = 0; i <= NB_COL; ++i)
+	// {
+	// 	trame[n++].position = sf::Vector2f(MARGIN_LEFT + i*TILE_SIZE, MARGIN_TOP );
+	// 	trame[n].color = sf::Color::Blue;
+	// 	trame[n++].position = sf::Vector2f(MARGIN_LEFT + i*TILE_SIZE, nbPix_y - MARGIN_BOTTOM);
+	// }
 
 	// on peut (ou pas) distinguer la scène générale cadre + frame et la scène particulière (les cases actuelles)
 	std::vector<sf::Drawable*> scene_generale;
 	std::vector<sf::Drawable*> scene_particuliere;
 	scene_generale.push_back(&centralPane);
-	scene_generale.push_back(&trame);
+	// scene_generale.push_back(&trame);
 
 	// on place ici la définition d'une texture rouge, probablement qu'il y a mieux à faire (flightweight ? map ?)
    	sf::Texture texture_rouge;
@@ -50,7 +65,7 @@ int main()
 	}
 
 	// Opérations graphiques générales
-	sf::RenderWindow window{sf::VideoMode{nbPix_x, nbPix_y}, "Piece Out"};
+	// sf::RenderWindow window{sf::VideoMode{nbPix_x, nbPix_y}, "Piece Out"};
 	while (window.isOpen())
 	{
 		int trig_x = -1, trig_y = -1;
@@ -98,6 +113,7 @@ int main()
 
 		// les affichages
 		for (sf::Drawable *x : scene_generale) window.draw(*x);
+		afficheurNiveau.dessiner();
 		for (sf::Drawable *x : scene_particuliere) window.draw(*x);
 		
         window.display();
