@@ -21,7 +21,7 @@ private:
     const int MARGIN_LEFT = 100, MARGIN_RIGHT = 100, MARGIN_TOP = 100, MARGIN_BOTTOM = 100;
 	const int TILE_SIZE = 64;
     const sf::Color COULEUR_DU_MUR = sf::Color{63,63,63};
-    const sf::Color COULEUR_VIDE = sf::Color{0,0,0,255};
+    const sf::Color COULEUR_VIDE = sf::Color{0,0,0,0};
 
     sf::RenderWindow& fenetre;
     const std::vector<Niveau*> niveaux;
