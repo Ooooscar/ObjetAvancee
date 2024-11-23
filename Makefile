@@ -47,7 +47,7 @@ all: ebaucheVue
 # $^ : Référence à tous les fils d'une règle
 ebaucheModel: ebaucheModel.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
-ebaucheVue: ebaucheVue.o Niveau.o
+ebaucheVue: ebaucheVue.o Niveau.o ebaucheModel.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 

@@ -13,16 +13,23 @@ int main()
 	unsigned int nbPix_x = 1000, nbPix_y = 1000; // TODO
 
 	sf::RenderWindow window{sf::VideoMode{nbPix_x, nbPix_y}, "Piece Out"};
-	std::vector<int> data0 = {
-		1,1,1,1,1,1,1,1,
-		1,1,0,1,1,0,1,1,
-		1,1,1,1,1,1,1,1,
-		1,0,1,1,1,1,0,1,
-		1,0,1,1,1,1,0,1,
-		1,1,0,0,0,0,1,1,
-		1,1,1,1,1,1,1,1,
+	PieceConcrete p1{{{0,0},{0,1}}, sf::Color::Red};
+	std::vector<Niveau> niveaux{
+		Niveau{
+			NB_COL, NB_LIGNE,
+			{
+				1,1,1,1,1,1,1,1,
+				1,1,0,1,1,0,1,1,
+				1,1,1,1,1,1,1,1,
+				1,0,1,1,1,1,0,1,
+				1,0,1,1,1,1,0,1,
+				1,1,0,0,0,0,1,1,
+				1,1,1,1,1,1,1,1,
+			},
+			{&p1},
+			{}
+		}
 	};
-	std::vector<Niveau*> niveaux{new Niveau{NB_COL, NB_LIGNE, data0}};
 	AfficheurNiveau afficheurNiveau{window, niveaux};
 	afficheurNiveau.dessiner();
 
@@ -30,25 +37,6 @@ int main()
     sf::RectangleShape centralPane(sf::Vector2f(NB_COL * TILE_SIZE, NB_LIGNE * TILE_SIZE));
 	centralPane.setPosition(MARGIN_LEFT, MARGIN_TOP);
 	centralPane.setFillColor(sf::Color::Cyan);
-
-	// // plus une trame (lignes horizontales + verticales). En SFML on peut passer par VertexArray
-	// // Lines est une sf::enum, VertexArray encapsule autant de points que nécessaires pour ces lignes
-	// sf::VertexArray trame(sf::Lines, (NB_COL+1 + NB_LIGNE+1) * 2); 
-	// // pour les lignes horizontales
-	// int n = 0;
-	// for (int i = 0; i <= NB_LIGNE; ++i)
-	// {
-	// 	trame[n++].position = sf::Vector2f(MARGIN_LEFT, MARGIN_TOP + i*TILE_SIZE);
-	// 	trame[n].color = sf::Color::Blue;
-	// 	trame[n++].position = sf::Vector2f(nbPix_x - MARGIN_RIGHT, MARGIN_TOP + i*TILE_SIZE);
-	// }
-	// // pour les verticales
-	// for (int i = 0; i <= NB_COL; ++i)
-	// {
-	// 	trame[n++].position = sf::Vector2f(MARGIN_LEFT + i*TILE_SIZE, MARGIN_TOP );
-	// 	trame[n].color = sf::Color::Blue;
-	// 	trame[n++].position = sf::Vector2f(MARGIN_LEFT + i*TILE_SIZE, nbPix_y - MARGIN_BOTTOM);
-	// }
 
 	// on peut (ou pas) distinguer la scène générale cadre + frame et la scène particulière (les cases actuelles)
 	std::vector<sf::Drawable*> scene_generale;
