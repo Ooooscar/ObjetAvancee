@@ -13,7 +13,8 @@ int main()
 	unsigned int nbPix_x = 1000, nbPix_y = 1000; // TODO
 
 	sf::RenderWindow window{sf::VideoMode{nbPix_x, nbPix_y}, "Piece Out"};
-	PieceConcrete p1{{{0,0},{0,1}}, sf::Color::Red};
+	window.setFramerateLimit(30);
+	PieceConcrete p1{{{0,0},{0,1},{0,2},{1,1}}, sf::Color::Red};
 	std::vector<Niveau> niveaux{
 		Niveau{
 			NB_COL, NB_LIGNE,
@@ -31,7 +32,6 @@ int main()
 		}
 	};
 	AfficheurNiveau afficheurNiveau{window, niveaux};
-	afficheurNiveau.dessiner();
 
     // définition d'un panneau "central"
     sf::RectangleShape centralPane(sf::Vector2f(NB_COL * TILE_SIZE, NB_LIGNE * TILE_SIZE));
