@@ -11,6 +11,8 @@ class PieceConcrete;
 class PieceOperateur;
 class OperateurDeplacement;
 enum OrientationDeplacement {NORD, SUD, EST, OUEST};
+enum OrientationSymetrie {HORIZONTALE, VERTICALE};
+enum OrientationRotation {HORAIRE, ANTIHORAIRE};
 
 class Piece {
 public:

@@ -1,5 +1,6 @@
 #ifndef _PIECEOUT_LEVEL
 #define _PIECEOUT_LEVEL
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include "ebaucheModel.hpp"
 
@@ -12,9 +13,8 @@ public:
     const std::vector<PieceConcrete*> piecesConcretes;
     const std::vector<PieceOperateur*> piecesOperateur;
 public:
-    Niveau(int nbCol, int nbLigne, const std::vector<int>& levelData);
     Niveau(int nbCol, int nbLigne, const std::vector<int>& levelData, const std::vector<PieceConcrete*>& piecesConcretes, const std::vector<PieceOperateur*>& piecesOperateur);
-    const int getData(int& x, int& y) const;
+    // const int getData(int& x, int& y) const;
 };
 
 class AfficheurNiveau
@@ -26,26 +26,29 @@ private:
     const sf::Color COULEUR_VIDE = sf::Color{0,0,0,0};
 
     sf::RenderWindow& fenetre;
-    const std::vector<Niveau>& niveaux;
-
 	unsigned int nbPix_x;
 	unsigned int nbPix_y;
+    const std::vector<Niveau>& niveaux;
     int indiceNiveauActuel;
     int nbCol, nbLigne;
+
+    sf::RectangleShape *const panneauCentral = new sf::RectangleShape;
     std::vector<sf::Vector2f> treillis;
     std::vector<sf::Vertex> sommetsTrame;
     std::vector<sf::Vertex> sommetsSceneParticuliere;
-
-    const sf::Color& getCouleur(int data);
-    void genereTrellis();
-    const sf::Vector2f& getPositionDeSommet(int x, int y) const;
-    void initialiseTrame();
 
 public:
     AfficheurNiveau(sf::RenderWindow& fenetre, std::vector<Niveau>& niveaux);
     void prochainNiveau();
     void allerAuNiveau(int indice);
     void dessiner();
+    void demarrer();
+private:
+    void initialiseTrame();
+    void genereTrellis();
+    void ajouterSommetsCellule(std::vector<sf::Vertex>& trame, int& x, int& y, const sf::Color& couleur, int& indiceSommet);
+    // const sf::Color& getCouleur(int data);
+    // const sf::Vector2f& getPositionDeSommet(int x, int y) const;
 };
 
 #endif

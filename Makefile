@@ -32,13 +32,13 @@ RM= rm -f
 
 
 # Liste des fichiers sources
-SOURCES = ebaucheModel.cpp ebaucheVue.cpp
+# SOURCES = ebaucheModel.cpp ebaucheVue.cpp
 # Liste des fichers objets
-OBJECTS = $(SOURCES:.cpp=.o)
+# OBJECTS = $(SOURCES:.cpp=.o)
 
 
 # Cible par défaut de la commande "make" :
-all: ebaucheVue
+all: Main
 
 # Cibles "%.o" pour générer un fichier objet (.o) à partir de chaque fichier source (.cpp) :
 # $< : Référence au premier fils de la règle (ici le nom du ficher .cpp)
@@ -52,17 +52,17 @@ all: ebaucheVue
 # $^ : Référence à tous les fils d'une règle
 ebaucheModel: ebaucheModel.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
-ebaucheVue: ebaucheVue.o Niveau.o ebaucheModel.o
+Main: Main.o Niveau.o ebaucheModel.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 
 # Cible "test" pour exécuter l'exécutable final :
 test:
-	./ebaucheVue
+	./Main
 
 # Cible "clean" pour nettoyer les fichiers générés :
 clean:
-	$(RM) *.o *.d ebaucheVue ebaucheVue.exe a.out a.exe
+	$(RM) *.o *.d *.exe
 
 # Inclure les fichiers de dépendances (.d) générés automatiquement pour chaque fichier objet (.o) :
 -include $(OBJECTS:.o=.d)
