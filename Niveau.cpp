@@ -1,28 +1,27 @@
 #include "Niveau.hpp"
+#include <cassert>
 
 ///////////////////////////////
 //////// CLASSE Niveau ////////
 
-Niveau::Niveau(int nbCol, int nbLigne, const std::vector<int>& levelData, const std::vector<PieceConcrete*>& piecesConcretes, const std::vector<PieceOperateur*>& piecesOperateur)
-	: nbCol{nbCol}, nbLigne{nbLigne}, levelData{levelData}, piecesConcretes{piecesConcretes}, piecesOperateur{piecesOperateur}
+Niveau::Niveau(const int nbCol, const int nbLigne, const std::vector<int> &levelData, const std::vector<Piece*>& pieces)
+	: nbCol{nbCol}, nbLigne{nbLigne}, levelData{std::move(levelData)}, pieces{std::move(pieces)}
 {}
-
-// 
-
-// const int Niveau::getData(int& x, int& y) const
-// {
-//     return levelData[y*nbCol + x];
-// }
 
 ////////////////////////////////////////
 //////// CLASSE AfficheurNiveau ////////
 
+//////// ATTRIBUTS STATIC CONST ////////
+
+const sf::Color AfficheurNiveau::COULEUR_DU_MUR = sf::Color{0x3F3F3FFF};
+const sf::Color AfficheurNiveau::COULEUR_DU_SOL = sf::Color{0xFFFFFCFF};
+
 //////// CONSTRUCTEURS ////////
 
-AfficheurNiveau::AfficheurNiveau(sf::RenderWindow& fenetre, std::vector<Niveau>& niveaux)
-	: fenetre{fenetre}, niveaux{niveaux}
+AfficheurNiveau::AfficheurNiveau(sf::RenderWindow& fenetre, const std::vector<Niveau>& niveaux)
+	: fenetre{fenetre}, niveaux{std::move(niveaux)}
 {
-    allerAuNiveau(0);
+	allerAuNiveau(0);
 }
 
 //////// METHODES PUBLICS ////////
@@ -35,16 +34,34 @@ void AfficheurNiveau::prochainNiveau()
 void AfficheurNiveau::allerAuNiveau(int indice)
 {
     indiceNiveauActuel = indice;
-    nbCol = niveaux[indiceNiveauActuel].nbCol;
-    nbLigne = niveaux[indiceNiveauActuel].nbLigne;
+	niveauActuel = &(niveaux[indiceNiveauActuel]);
+    nbCol = niveauActuel->nbCol;
+    nbLigne = niveauActuel->nbLigne;
 
 	// Initialise les sommets de la scène générale (les murs et le sol)
     initialiseTrame();
 
+	// On veut recopier les données du niveau choisi ici
+	dataActuel = std::vector<int>(niveauActuel->levelData.size());
+	std::vector<int>::const_iterator itLecture{niveauActuel->levelData.begin()};
+	std::vector<int>::iterator itEcriture{dataActuel.begin()};
+	for (; itEcriture != dataActuel.end(); ++itLecture, ++itEcriture) {
+		*itEcriture = (*itLecture == 1) ? 1 : 0;
+	}
+	dataActuel = niveauActuel->levelData; // ici une copie est faite
+	for (size_t i = 0; i < dataActuel.size(); ++i) {
+		dataActuel[i] = (niveauActuel->levelData[i] == 1) ? 1 : 0;
+	}
+
 	// Allouer la mémoire pour les sommets des pièces concrètes
+	// et générer les données actuelles du niveau
+	int numeroPiece = 2;
 	size_t nbCasesOccupes = 0;
-	for (PieceConcrete* p : niveaux[indiceNiveauActuel].piecesConcretes) {
-		nbCasesOccupes += p->getCoordinates().size();
+	for (Piece *p : niveauActuel->pieces) {
+		nbCasesOccupes += p->coordinates.size();
+		for (std::pair<int, int> &coord : p->coordinates) {
+			dataActuel[coord.second*nbCol + coord.first] = numeroPiece;
+		}
 	}
 	sommetsSceneParticuliere = std::vector<sf::Vertex>(nbCasesOccupes * 6);
 }
@@ -52,16 +69,13 @@ void AfficheurNiveau::allerAuNiveau(int indice)
 void AfficheurNiveau::dessiner()
 {
 	// Scène générale (le sol et les murs)
-	// le sol
 	fenetre.draw(*panneauCentral);
-	// les murs
     fenetre.draw(&sommetsTrame[0], sommetsTrame.size(), sf::Triangles);
 
 	// Scène particulière (les pièces concrètes)
-	int indiceSommet = 0;
-	for (PieceConcrete* p : niveaux[indiceNiveauActuel].piecesConcretes) {
+	for (Piece *p : niveaux[indiceNiveauActuel].pieces) {
 		for (std::pair<int,int> coord : p->coordinates) {
-			ajouterSommetsCellule(sommetsSceneParticuliere, coord.first, coord.second, p->couleur, indiceSommet);
+			ajouterSommetsCellule(sommetsSceneParticuliere, coord.first, coord.second, p->couleur.first);
 		}
 	}
     fenetre.draw(&sommetsSceneParticuliere[0], sommetsSceneParticuliere.size(), sf::Triangles);
@@ -81,7 +95,7 @@ void AfficheurNiveau::demarrer()
 	// Opérations graphiques générales
 	while (fenetre.isOpen())
 	{
-		int trig_x = -1, trig_y = -1;
+		float trig_x = -1, trig_y = -1;
 		sf::Vector2i mousePos = sf::Mouse::getPosition(fenetre);
 		sf::Vector2f mouseWorldPos = fenetre.mapPixelToCoords(mousePos);
 		std::string message = "Mouse Position: ("
@@ -139,55 +153,49 @@ void AfficheurNiveau::initialiseTrame()
 	// Le sol
     *panneauCentral = sf::RectangleShape{sf::Vector2f(nbCol * TILE_SIZE, nbLigne * TILE_SIZE)};
 	panneauCentral->setPosition(MARGIN_LEFT, MARGIN_TOP);
-	panneauCentral->setFillColor(sf::Color::Cyan);
+	panneauCentral->setFillColor(COULEUR_DU_SOL);
 
     // Les murs
-	genereTrellis();
-	sommetsTrame.resize(nbCol * nbLigne * 6);
-	int indiceSommet = 0;
-	size_t indiceCellule = 0;
+	genereTreillis();
+	
+	std::vector<sf::Vertex>{}.swap(sommetsTrame);
+	sommetsTrame.reserve(nbCol * nbLigne * 6);
+	int indiceCellule = 0;
 	for (int y = 0; y < nbLigne; ++y) {
 		for (int x = 0; x < nbCol; ++x) {
-			if (niveaux[indiceNiveauActuel].levelData[indiceCellule] == 1) {
-				ajouterSommetsCellule(sommetsTrame, x, y, COULEUR_DU_MUR, indiceSommet);
+			switch (niveauActuel->levelData[indiceCellule]) {
+				case 0 :
+					break;
+				case 1 :
+					ajouterSommetsCellule(sommetsTrame, x, y, COULEUR_DU_MUR);
+					break;
+				default	:
+					ajouterSommetsCellule(sommetsTrame, x, y, niveauActuel->pieces[0]->couleur.second);
+					break;
 			}
 			++indiceCellule;
 		}
 	}
 }
 
-void AfficheurNiveau::genereTrellis()
+void AfficheurNiveau::genereTreillis()
 {
-    treillis.reserve((nbCol + 1) * (nbLigne + 1));
-	int indicePosition = 0;
+	std::vector<sf::Vector2f>{}.swap(treillis);
+	treillis.reserve((nbCol + 1) * (nbLigne + 1));
 	for (int y = MARGIN_TOP; y <= MARGIN_TOP + nbLigne * TILE_SIZE; y += TILE_SIZE) {
 		for (int x = MARGIN_LEFT; x <= MARGIN_LEFT + nbCol * TILE_SIZE; x += TILE_SIZE) {
-			treillis[indicePosition++] = sf::Vector2f{static_cast<float>(x), static_cast<float>(y)};
+			treillis.emplace_back(sf::Vector2f{static_cast<float>(x), static_cast<float>(y)});
 		}
 	}
 }
 
-void AfficheurNiveau::ajouterSommetsCellule(std::vector<sf::Vertex>& trame, int& x, int& y, const sf::Color& couleur, int& indiceSommet)
+void AfficheurNiveau::ajouterSommetsCellule(std::vector<sf::Vertex>& trame, int& x, int& y, const sf::Color& couleur)
 {
 	int indiceCellulePlusY{y*(nbCol+1) + x};
-	trame[indiceSommet++] = sf::Vertex(treillis[indiceCellulePlusY], couleur);
-	trame[indiceSommet++] = sf::Vertex(treillis[indiceCellulePlusY+1], couleur);
-	trame[indiceSommet++] = sf::Vertex(treillis[indiceCellulePlusY+nbCol+1], couleur);
-	trame[indiceSommet++] = sf::Vertex(treillis[indiceCellulePlusY+1], couleur);
-	trame[indiceSommet++] = sf::Vertex(treillis[indiceCellulePlusY+nbCol+1], couleur);
-	trame[indiceSommet++] = sf::Vertex(treillis[indiceCellulePlusY+nbCol+2], couleur);
+	trame.emplace_back(sf::Vertex(treillis[indiceCellulePlusY], couleur));
+	trame.emplace_back(sf::Vertex(treillis[indiceCellulePlusY+1], couleur));
+	trame.emplace_back(sf::Vertex(treillis[indiceCellulePlusY+nbCol+1], couleur));
+	trame.emplace_back(sf::Vertex(treillis[indiceCellulePlusY+1], couleur));
+	trame.emplace_back(sf::Vertex(treillis[indiceCellulePlusY+nbCol+1], couleur));
+	trame.emplace_back(sf::Vertex(treillis[indiceCellulePlusY+nbCol+2], couleur));
 }
-
-// const sf::Color& AfficheurNiveau::getCouleur(int data)
-// {
-// 	switch (data) {
-// 		case 1: return COULEUR_DU_MUR;
-// 		case 0: return COULEUR_VIDE;
-// 		default: return COULEUR_VIDE;
-// 	}
-// }
-
-// const sf::Vector2f& AfficheurNiveau::getPositionDeSommet(int x, int y) const
-// {
-//     return treillis[y*(nbCol+1) + x];
-// }

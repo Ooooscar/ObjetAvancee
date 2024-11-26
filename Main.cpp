@@ -9,21 +9,20 @@ int main()
 	sf::RenderWindow window{sf::VideoMode{nbPix_x, nbPix_y}, "Piece Out"};
 	window.setFramerateLimit(30);
 
-	PieceConcrete p1{{{0,0},{0,1},{0,2},{1,1}}, sf::Color::Red};
+	Piece p1{{{1,2},{2,1},{2,2},{3,1}}, {}, CouleurPiece::VERT};
+	PieceOperateur *op = new OperateurDeplacement{p1, {1,2}, EST}; //TODO
+	p1.accept(*op);
+	p1.accept(*op);
 	std::vector<Niveau> niveaux{
-		Niveau{
-			8, 7,
+		{
+			8, 4,
 			{
 				1,1,1,1,1,1,1,1,
-				1,1,0,1,1,0,1,1,
-				1,1,1,1,1,1,1,1,
-				1,0,1,1,1,1,0,1,
-				1,0,1,1,1,1,0,1,
-				1,1,0,0,0,0,1,1,
+				1,0,0,0,0,2,2,1,
+				1,0,0,0,2,2,1,1,
 				1,1,1,1,1,1,1,1,
 			},
-			{&p1},
-			{}
+			{&p1}
 		}
 	};
 

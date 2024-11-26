@@ -17,9 +17,9 @@ CPPFLAGS= -I $(CURDIR)/SFML-2.6.1/include
 LDFLAGS= -L $(CURDIR)/SFML-2.6.1/lib
 # Si l'on est sur Windows:
 # -mwindows : ne pas afficher le console quand on fait démarrer le programme
-ifeq ($(OS),Windows_NT)
-    LDFLAGS += -mwindows
-endif
+# ifeq ($(OS),Windows_NT)
+#     LDFLAGS += -mwindows
+# endif
 
 # Bibliothèques à lier ("Linker Libraries") :
 # -l : Spécifie le nom d'une bibliothèque à lier

@@ -3,3 +3,4 @@
 *.exe
 /SFML-2.6.1/*
 /.vscode
+/test/*
