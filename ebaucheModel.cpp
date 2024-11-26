@@ -5,7 +5,7 @@
 //////// CLASSE Piece ////////
 
 Piece::Piece(const vector<pair<int, int>> &coords, const vector<PieceOperateur*> &operateurs, const CouleurPiece &couleur)
-    : coordinates{coords}, operateurs{operateurs}, couleur{couleur}
+    : coordinates{std::move(coords)}, operateurs{std::move(operateurs)}, couleur{couleur}
 {}
 
 const vector<pair<int, int>>& Piece::getCoordinates() const {
@@ -27,7 +27,7 @@ void Piece::accept(PieceOperateur &v) {
 //////// CLASSE PieceOperateur ////////
 
 PieceOperateur::PieceOperateur(Piece &source, const pair<int,int> &position)
-    : source{source}, position{position}
+    : source{source}, position{std::move(position)}
 {}
 
 bool PieceOperateur::trigger(const pair<float, float> &pos) {

@@ -20,7 +20,7 @@ class Piece
 public:
 	vector<pair<int, int>> coordinates;
 	const vector<PieceOperateur*> operateurs;
-	const CouleurPiece& couleur;
+	const CouleurPiece &couleur;
 public:
 	Piece(const vector<pair<int, int>> &coords, const vector<PieceOperateur*> &operateurs, const CouleurPiece &couleur);
 	const vector<pair<int, int>>& getCoordinates() const;
@@ -32,7 +32,7 @@ public:
 class PieceOperateur
 {
 protected:
-	Piece& source;
+	Piece &source;
 	pair<int, int> position;
 public:
 	PieceOperateur(Piece &source, const pair<int,int> &position);
