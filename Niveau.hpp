@@ -3,7 +3,7 @@
 #include <utility>
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include "ebaucheModel.hpp"
+#include "Piece.hpp"
 
 class Niveau
 {

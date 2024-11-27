@@ -50,9 +50,9 @@ all: Main
 
 # Cibles pour générer les exécutables à partir des fichiers objets :
 # $^ : Référence à tous les fils d'une règle
-ebaucheModel: ebaucheModel.o
+Piece: Piece.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
-Main: Main.o Niveau.o ebaucheModel.o
+Main: Main.o Niveau.o Piece.o PieceOperateur.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 
