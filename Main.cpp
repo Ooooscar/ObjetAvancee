@@ -10,9 +10,9 @@ int main()
 	window.setFramerateLimit(30);
 
 	Piece p1{{{1,1},{2,1},{2,2},{3,2}}, {}, CouleurPiece::VERT};
-	PieceOperateur &op = p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::SUD);
-	p1.accept(op);
-	p1.accept(*(p1.operateurs[0]));
+	PieceOperateur &op1 = p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::SUD);
+	PieceOperateur &op2 = p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::EST);
+	PieceOperateur &op3 = p1.ajouteOpRotation({2,1}, OperateurRotation::ANTIHORAIRE);
 	// PieceOperateur *op = new OperateurDeplacement{p1, {1,2}, EST}; //TODO
 	// p1.accept(*op);
 	// p1.accept(*op);
@@ -30,6 +30,14 @@ int main()
 			{&p1}
 		}
 	};
+	
+	p1.accept(op1);
+	p1.accept(*(p1.operateurs[0]));
+	p1.accept(op2);
+	p1.accept(op2);
+	p1.accept(op2);
+	p1.accept(op3);
+	p1.accept(op2);
 
 	AfficheurNiveau afficheurNiveau{window, niveaux};
     afficheurNiveau.demarrer();

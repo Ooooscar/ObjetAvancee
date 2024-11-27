@@ -88,13 +88,18 @@ void OperateurRotation::mapPosition(pair<int, int> &pos) const {
     switch (sens) {
         case HORAIRE :
             // Rotation 90° horarire : (x, y) -> (y, -x)
-            pos.first = (int)(position.first + (pos.second - position.second));
-            pos.second = (int)(position.second - (pos.first - position.first));
+            pos = std::move(std::make_pair<int>(
+                    position.first - (pos.second - position.second),
+                    position.second + (pos.first - position.first)
+                ));
             break;
         case ANTIHORAIRE :
             // Rotation 90° anti-horarire : (x, y) -> (-y, x)
-            pos.first = (int)(position.first - (pos.second - position.second));
-            pos.second = (int)(position.second + (pos.first - position.first));
+            pos = std::move(std::make_pair<int>(
+                    position.first + (pos.second - position.second),
+                    position.second - (pos.first - position.first)
+                ));
+            break;
             break;
     }
 }
