@@ -33,8 +33,8 @@ OperateurSymetrie& PieceData::ajouteOpSymetrie(const pair<int, int> &position, O
 // {
 // }
 
-Piece::Piece(int indice, const PieceData &dataPiece)
-    : PieceData{dataPiece}, indice{indice}, sommets{}
+Piece::Piece(int indice, const PieceData &dataPiece, const std::vector<sf::Vertex> &sommets)
+    : PieceData{dataPiece}, indice{indice}, sommets{sommets}
 {}
 
 const int Piece::getIndice() const { return indice; }
@@ -63,6 +63,10 @@ void Piece::accept(PieceOperateur &op, std::vector<int> &casesActuelles) {
     for (PieceOperateur *otherOp : operateurs) {
         op.mapOperateur(*otherOp);
     }
+}
+
+void Piece::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+    target.draw(&sommets[0], sommets.size(), sf::Triangles);
 }
 
 /////////////////////////////////////
