@@ -3,8 +3,8 @@
 ///////////////////////////////////////
 //////// CLASSE PieceOperateur ////////
 
-PieceOperateur::PieceOperateur(const std::pair<int,int> &position)
-    : position{std::move(position)}
+PieceOperateur::PieceOperateur(const std::pair<int,int> &position) :
+    position{std::move(position)}
 {}
 
 void PieceOperateur::accepter(const OperateurDeplacement &op) {
@@ -20,8 +20,9 @@ void PieceOperateur::accepter(const OperateurSymetrie &op) {
 /////////////////////////////////////////////
 //////// CLASSE OperateurDeplacement ////////
 
-OperateurDeplacement::OperateurDeplacement(const std::pair<int,int> &position, Orientation sens)
-    : PieceOperateur{position}, sens{sens}
+OperateurDeplacement::OperateurDeplacement(const std::pair<int,int> &position, Orientation sens) :
+    PieceOperateur{position},
+    sens{sens}
 {}
 
 void OperateurDeplacement::mapPosition(std::pair<int, int> &pos) const {
@@ -80,8 +81,9 @@ void OperateurDeplacement::accepter(const OperateurSymetrie &op) {
 //////////////////////////////////////////
 //////// CLASSE OperateurRotation ////////
 
-OperateurRotation::OperateurRotation(const std::pair<int,int> &position, Orientation sens)
-    : PieceOperateur{position}, sens{sens}
+OperateurRotation::OperateurRotation(const std::pair<int,int> &position, Orientation sens) :
+    PieceOperateur{position},
+    sens{sens}
 {}
 
 void OperateurRotation::mapPosition(std::pair<int, int> &pos) const {
@@ -115,8 +117,9 @@ void OperateurRotation::accepter(const OperateurSymetrie &op) {
 //////////////////////////////////////////
 //////// CLASSE OperateurSymetrie ////////
 
-OperateurSymetrie::OperateurSymetrie(const std::pair<int,int> &position, Orientation sens)
-    : PieceOperateur{position}, sens{sens}
+OperateurSymetrie::OperateurSymetrie(const std::pair<int,int> &position, Orientation sens) :
+    PieceOperateur{position},
+    sens{sens}
 {}
 
 void OperateurSymetrie::mapPosition(std::pair<int, int> &pos) const {

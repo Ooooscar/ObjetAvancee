@@ -6,8 +6,10 @@
 //////////////////////////////////
 //////// CLASSE PieceData ////////
 
-PieceData::PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur)
-    : coordonnees{coords}, operateurs{}, couleur{couleur}
+PieceData::PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur) :
+    coordonnees{coords},
+    operateurs{},
+    couleur{couleur}
 {}
 
 OperateurDeplacement& PieceData::ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens) {
@@ -29,8 +31,12 @@ OperateurSymetrie& PieceData::ajouterOpSymetrie(const std::pair<int, int> &posit
 //////////////////////////////
 //////// CLASSE Piece ////////
 
-Piece::Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece)
-    : PieceData{dataPiece}, niveau{niveau}, indicePiece{indicePiece}, auBonEndroit{false}, sommets{}
+Piece::Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece) :
+    PieceData{dataPiece},
+    niveau{niveau},
+    indicePiece{indicePiece},
+    auBonEndroit{false},
+    sommets{}
 {}
 
 const int Piece::getIndice() const { return indicePiece; }
@@ -82,8 +88,8 @@ void Piece::draw(sf::RenderTarget &target, sf::RenderStates states) const {
 /////////////////////////////////////
 //////// CLASSE CouleurPiece ////////
 
-CouleurPiece::CouleurPiece(const sf::Color &piece, const sf::Color &cible)
-	: std::pair<sf::Color, sf::Color>{piece, cible}
+CouleurPiece::CouleurPiece(const sf::Color &piece, const sf::Color &cible) :
+    std::pair<sf::Color, sf::Color>{piece, cible}
 {}
 
 const CouleurPiece CouleurPiece::ROUGE {sf::Color{0xFD4030FF}, sf::Color{0xFEB0A9FF}};
