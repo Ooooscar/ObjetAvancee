@@ -11,26 +11,32 @@ NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int
 	: nbCol{nbCol}, nbLigne{nbLigne}, casesAttendues{casesAttendues}, dataPieces{}
 {}
 
-Piece& NiveauData::ajoutePiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur) {
-	dataPieces.emplace_back(Piece{static_cast<int>(dataPieces.size()), coords, couleur});
+PieceData& NiveauData::ajoutePiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur) {
+	dataPieces.emplace_back(PieceData{coords, couleur});
 	return dataPieces.back();
 }
 
-///////////////////////////////////
+///////////////////////////////
 //////// CLASSE Niveau ////////
 
-Niveau::Niveau(const NiveauData &niveauData)
-	: NiveauData{niveauData}, pieces{dataPieces}, casesActuelles{}, nbCasesOccupees{0}
+Niveau::Niveau(const NiveauData &dataNiveau, AfficheurNiveau &aff)
+	: NiveauData{dataNiveau}, pieces{}, casesActuelles{}, nbCasesOccupees{0}
 {
+	pieces.reserve(dataPieces.size());
+	for (const PieceData &dataPiece : dataPieces) {
+		// pieces.emplace_back(Piece(static_cast<int>(pieces.size()), dataPiece, aff));
+		pieces.emplace_back(Piece(static_cast<int>(pieces.size()), dataPiece));
+	}
+
 	casesActuelles.reserve(casesAttendues.size());
 	// Recopier les positions des murs de `casesAttendues` dans `casesActuelles`
 	for (int data : casesAttendues) {
 		casesActuelles.emplace_back((data == 1) ? 1 : 0);
 	}
 	// Écriver les positions des `Piece` dans `casesActuelles`
-	for (Piece &p : pieces) {
-		for (std::pair<int, int> &coord : p.coordinates) {
-			setData(coord.first, coord.second, p.indice + 2);
+	for (const Piece &p : pieces) {
+		for (const std::pair<int, int> &coord : p.getCoordinates()) {
+			setData(coord.first, coord.second, p.getIndice() + 2);
 			++nbCasesOccupees;
 		}
 	}
@@ -46,11 +52,11 @@ const int Niveau::getDataActuelle(int x, int y) const { return getDataActuellePa
 const int Niveau::getDataAttendueParIndice(int indice) const { return casesAttendues[indice]; }
 const int Niveau::getDataAttendue(int x, int y) const { return getDataAttendueParIndice(y * nbCol + x); }
 
-const sf::Color& Niveau::getCouleurPiece(int indicePiece) const {
-	return pieces[indicePiece].couleur.first;
+const sf::Color& Niveau::getCouleur(int indicePiece) const {
+	return pieces[indicePiece].getCouleur();
 }
-const sf::Color& Niveau::getCouleurPieceSecondaire(int indicePiece) const {
-	return pieces[indicePiece].couleur.second;
+const sf::Color& Niveau::getCouleurSecondaire(int indicePiece) const {
+	return pieces[indicePiece].getCouleurSecondaire();
 }
 
 void Niveau::setData(int x, int y, int value) {
@@ -75,7 +81,7 @@ AfficheurNiveau::AfficheurNiveau(sf::RenderWindow &fenetre, const std::vector<Ni
 	// ici les deep-copies sont faites pour les `std::vector`
 	// TODO : éviter la copie de `std::vector<NiveauData>& niveaux` ici...
 	: fenetre{fenetre}, niveaux{niveaux},
-		indiceNiveauActuel{0}, niveauActuel{Niveau(niveaux[0])},
+		indiceNiveauActuel{0}, niveauActuel{Niveau(niveaux[0], *this)},
 		nbCol{niveauActuel.getNbCol()}, nbLigne{niveauActuel.getNbLigne()}
 {
 	initialiseNiveau();
@@ -91,7 +97,7 @@ void AfficheurNiveau::prochainNiveau()
 void AfficheurNiveau::allerAuNiveau(int indice)
 {
     indiceNiveauActuel = indice;
-	niveauActuel = Niveau(niveaux[indiceNiveauActuel]);
+	niveauActuel = Niveau(niveaux[indiceNiveauActuel], *this);
 	initialiseNiveau();
 }
 
@@ -104,8 +110,8 @@ void AfficheurNiveau::dessiner()
 	// Scène particulière (les pièces concrètes)
 	sommetsSceneParticuliere.clear();
 	for (Piece p : niveauActuel.pieces) { // TODO: make pieces private
-		for (std::pair<int,int> coord : p.coordinates) {
-			ajouteSommetsCellule(sommetsSceneParticuliere, coord.first, coord.second, p.couleur.first);
+		for (std::pair<int,int> coord : p.getCoordinates()) {
+			ajouteSommetsCellule(sommetsSceneParticuliere, coord.first, coord.second, p.getCouleur());
 		}
 	}
     fenetre.draw(&sommetsSceneParticuliere[0], sommetsSceneParticuliere.size(), sf::Triangles);
@@ -198,7 +204,7 @@ void AfficheurNiveau::initialiseTrame()
 				default	:
 					int indicePiece = dataAttendue - 2;
 					if (indicePiece < niveauActuel.getNbPieces())
-						ajouteSommetsCellule(sommetsTrame, x, y, niveauActuel.getCouleurPieceSecondaire(indicePiece));
+						ajouteSommetsCellule(sommetsTrame, x, y, niveauActuel.getCouleurSecondaire(indicePiece));
 					break;
 			}
 			++indiceCellule;

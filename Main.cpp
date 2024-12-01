@@ -23,7 +23,7 @@ int main()
 		}
 	};
 
-	Piece &p1 = niveaux[0].ajoutePiece({{1,1},{2,1},{2,2},{3,2}}, CouleurPiece::VERT);
+	PieceData &p1 = niveaux[0].ajoutePiece({{1,1},{2,1},{2,2},{3,2}}, CouleurPiece::VERT);
 	p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::SUD);
 	p1.ajouteOpDeplacement({3,2}, OperateurDeplacement::EST);
 	p1.ajouteOpRotation({2,1}, OperateurRotation::ANTIHORAIRE);

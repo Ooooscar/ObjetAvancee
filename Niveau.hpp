@@ -11,11 +11,11 @@ protected:
     int nbCol;
     int nbLigne;
     std::vector<int> casesAttendues;
-    std::vector<Piece> dataPieces;
+    std::vector<PieceData> dataPieces;
 public:
     NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &casesAttendues);
     NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &&casesAttendues);
-    Piece& ajoutePiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
+    PieceData& ajoutePiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
 };
 
 class Niveau : public NiveauData
@@ -26,7 +26,7 @@ private:
     std::vector<int> casesActuelles;
     int nbCasesOccupees;
 public:
-    Niveau(const NiveauData &niveauData);
+    Niveau(const NiveauData &dataNiveau, AfficheurNiveau &aff);
     const int getNbCol() const;
     const int getNbLigne() const;
     const int getNbPieces() const;
@@ -36,8 +36,8 @@ public:
     const int getDataActuelle(int x, int y) const;
     const int getDataAttendueParIndice(int indice) const;
     const int getDataAttendue(int x, int y) const;
-    const sf::Color& getCouleurPiece(int indicePiece) const;
-    const sf::Color& getCouleurPieceSecondaire(int indicePiece) const;
+    const sf::Color& getCouleur(int indicePiece) const;
+    const sf::Color& getCouleurSecondaire(int indicePiece) const;
 
     void setData(int x, int y, int value);
     void triggerPiece(int indice, int mouseX, int mouseY);

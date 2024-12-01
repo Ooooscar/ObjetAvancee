@@ -19,7 +19,7 @@ public:
 	virtual void accept(const OperateurDeplacement &op);
 	virtual void accept(const OperateurRotation &op);
 	virtual void accept(const OperateurSymetrie &op);
-	// virtual void visit(Piece &p) const;
+	// virtual void visit(PieceData &p) const;
 	
 	// virtual void visit(OperateurDeplacement &) const = 0;
 	//virtual void visit(OperateurRotation &) const = 0;

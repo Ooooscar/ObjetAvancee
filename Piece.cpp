@@ -2,32 +2,45 @@
 #include <cmath>
 #include <iostream>
 
-//////////////////////////////
-//////// CLASSE Piece ////////
+//////////////////////////////////
+//////// CLASSE PieceData ////////
 
-Piece::Piece(int indice, const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur)
-    : indice{0}, coordinates{coords}, operateurs{}, couleur{couleur}
+PieceData::PieceData(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur)
+    : coordinates{coords}, operateurs{}, couleur{couleur}
 {}
 
-const std::vector<pair<int, int>>& Piece::getCoordinates() const {
-    return coordinates;
-}
-
-OperateurDeplacement& Piece::ajouteOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens) {
+OperateurDeplacement& PieceData::ajouteOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens) {
     OperateurDeplacement* op = new OperateurDeplacement{position, sens};
     operateurs.emplace_back(op);
     return *op;
 }
-OperateurRotation& Piece::ajouteOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens) {
+OperateurRotation& PieceData::ajouteOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens) {
     OperateurRotation* op = new OperateurRotation{position, sens};
     operateurs.push_back(op);
     return *op;
 }
-OperateurSymetrie& Piece::ajouteOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens) {
+OperateurSymetrie& PieceData::ajouteOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens) {
     OperateurSymetrie* op = new OperateurSymetrie{position, sens};
     operateurs.push_back(op);
     return *op;
 }
+
+//////////////////////////////
+//////// CLASSE Piece ////////
+
+// Piece::Piece(int indice, const PieceData &dataPiece, const AfficheurNiveau &aff)
+//     : indice{indice}, PieceData{dataPiece}, sommets{}
+// {
+// }
+
+Piece::Piece(int indice, const PieceData &dataPiece)
+    : PieceData{dataPiece}, indice{indice}, sommets{}
+{}
+
+const int Piece::getIndice() const { return indice; }
+const std::vector<pair<int, int>>& Piece::getCoordinates() const { return coordinates; }
+const sf::Color& Piece::getCouleur() const { return couleur.first; }
+const sf::Color& Piece::getCouleurSecondaire() const { return couleur.second; }
 
 void Piece::trigger(int mouseX, int mouseY, std::vector<int> &casesActuelles) {
     for (PieceOperateur *op : operateurs) {

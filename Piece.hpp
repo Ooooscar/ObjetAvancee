@@ -17,21 +17,33 @@ public:
     static const CouleurPiece VIOLET;
 };
 
-class Piece
+class PieceData
 {
-public:
-	int indice;
+protected:
 	std::vector<pair<int, int>> coordinates;
 	std::vector<PieceOperateur*> operateurs;
 	CouleurPiece couleur;
-// private:
-// 	std::vector<sf::Vertex> sommets;
 public:
-	Piece(int indice, const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
-	const std::vector<pair<int, int>>& getCoordinates() const;
+	PieceData(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
 	OperateurDeplacement& ajouteOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens);
 	OperateurRotation& ajouteOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens);
 	OperateurSymetrie& ajouteOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens);
+};
+
+class AfficheurNiveau;
+class Piece : public PieceData
+{
+private:
+	int indice;
+	std::vector<sf::Vertex> sommets;
+public:
+	Piece(int indice, const PieceData &dataPiece);
+	// Piece(int indice, const PieceData &dataPiece, const AfficheurNiveau &aff);
+	const int getIndice() const;
+	const std::vector<pair<int, int>>& getCoordinates() const;
+    const sf::Color& getCouleur() const;
+    const sf::Color& getCouleurSecondaire() const;
+
 	void trigger(int mouseX, int mouseY, std::vector<int> &casesActuelles);
 	void accept(PieceOperateur &op, std::vector<int> &casesActuelles);
 	// virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
