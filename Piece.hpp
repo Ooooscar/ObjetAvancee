@@ -30,15 +30,18 @@ public:
 	OperateurSymetrie& ajouterOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens);
 };
 
-class Piece : public PieceData, public sf::Drawable
+class Niveau;
+
+class Piece : private PieceData, public sf::Drawable
 {
 private:
-	int indice;
-public:
+	Niveau &niveau;
+	const int indice;
 	std::vector<sf::Vertex> sommets;
+	friend class Niveau;
 public:
-	Piece(int indice, const PieceData &dataPiece, const std::vector<sf::Vertex> &sommets);
-	// Piece(int indice, const PieceData &dataPiece, const AfficheurNiveau &aff);
+	// Piece(int indice, const PieceData &dataPiece, int tailleCase);
+	Piece(Niveau &niveau, int indice, const PieceData &dataPiece);
 	const int getIndice() const;
 	const std::vector<pair<int, int>>& getCoordonnees() const;
     const sf::Color& getCouleur() const;

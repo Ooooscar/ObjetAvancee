@@ -28,13 +28,8 @@ OperateurSymetrie& PieceData::ajouterOpSymetrie(const pair<int, int> &position, 
 //////////////////////////////
 //////// CLASSE Piece ////////
 
-// Piece::Piece(int indice, const PieceData &dataPiece, const AfficheurNiveau &aff)
-//     : indice{indice}, PieceData{dataPiece}, sommets{}
-// {
-// }
-
-Piece::Piece(int indice, const PieceData &dataPiece, const std::vector<sf::Vertex> &sommets)
-    : PieceData{dataPiece}, indice{indice}, sommets{sommets}
+Piece::Piece(Niveau &niveau, int indice, const PieceData &dataPiece)
+    : PieceData{dataPiece}, niveau{niveau}, indice{indice}, sommets{}
 {}
 
 const int Piece::getIndice() const { return indice; }

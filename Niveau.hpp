@@ -18,11 +18,13 @@ public:
     PieceData& ajouterPiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
 };
 
-class Niveau : public NiveauData, public sf::Drawable
+class Niveau : private NiveauData, public sf::Drawable
 {
-private:
+public:
     static const int MARGIN_LEFT = 100, MARGIN_RIGHT = 100, MARGIN_TOP = 100, MARGIN_BOTTOM = 100;
     static const int TILE_SIZE = 96;
+
+private:
     static const sf::Color COULEUR_DU_MUR;
     static const sf::Color COULEUR_DU_SOL;
 

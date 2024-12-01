@@ -37,7 +37,7 @@ Niveau::Niveau(const NiveauData &dataNiveau)
 
 	pieces.reserve(dataPieces.size());
 	for (const PieceData &dataPiece : dataPieces) {
-		pieces.emplace_back(Piece(static_cast<int>(pieces.size()), dataPiece, {}));
+		pieces.emplace_back(Piece(*this, static_cast<int>(pieces.size()), dataPiece));
 	}
 
 	sommetsTrame.reserve(nbCol * nbLigne * 6);
@@ -150,7 +150,7 @@ AfficheurNiveau::AfficheurNiveau(sf::RenderWindow &fenetre, const std::vector<Ni
 	// ici les deep-copies sont faites pour les `std::vector`
 	// TODO : éviter la copie de `std::vector<NiveauData>& niveaux` ici...
 	: fenetre{fenetre}, niveaux{niveaux},
-		indiceNiveauActuel{0}, niveauActuel{Niveau(niveaux[0])}
+		indiceNiveauActuel{0}, niveauActuel{niveaux[0]}
 {}
 
 //////// METHODES PUBLICS ////////
