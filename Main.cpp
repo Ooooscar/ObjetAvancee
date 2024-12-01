@@ -9,7 +9,7 @@ int main()
 	sf::RenderWindow window{sf::VideoMode{nbPix_x, nbPix_y}, "Piece Out"};
 	window.setFramerateLimit(30);
 
-	std::vector<Niveau> niveaux{
+	std::vector<NiveauData> niveaux{
 		{
 			8, 6,
 			{
@@ -31,8 +31,5 @@ int main()
 	AfficheurNiveau afficheurNiveau{window, niveaux};
     afficheurNiveau.demarrer();
 
-	// Remarquez que la destruction des objets n'est pas faites
-	// et que dans ce code il ne suffit pas de détruire scene_generale et 
-	// scene_particuliere car on y a ajouté des objets créés par new et d'autre déclarés dans un bloc... ce qui n'est pas malin.
     return EXIT_SUCCESS;
 }

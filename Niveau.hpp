@@ -5,16 +5,42 @@
 #include <SFML/Graphics.hpp>
 #include "Piece.hpp"
 
-class Niveau
+class NiveauData
+{
+protected:
+    int nbCol;
+    int nbLigne;
+    std::vector<int> casesAttendues;
+    std::vector<Piece> dataPieces;
+public:
+    NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &casesAttendues);
+    NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &&casesAttendues);
+    Piece& ajoutePiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
+};
+
+class Niveau : public NiveauData
 {
 public:
-    const int nbCol;
-    const int nbLigne;
-    const std::vector<int> levelData;
     std::vector<Piece> pieces;
+private:
+    std::vector<int> casesActuelles;
+    int nbCasesOccupees;
 public:
-    Niveau(const int nbCol, const int nbLigne, const std::vector<int> &&levelData);
-    Piece& ajoutePiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
+    Niveau(const NiveauData &niveauData);
+    const int getNbCol() const;
+    const int getNbLigne() const;
+    const int getNbPieces() const;
+    const int getNbCasesOccupees() const;
+
+    const int getDataActuelleParIndice(int indice) const;
+    const int getDataActuelle(int x, int y) const;
+    const int getDataAttendueParIndice(int indice) const;
+    const int getDataAttendue(int x, int y) const;
+    const sf::Color& getCouleurPiece(int indicePiece) const;
+    const sf::Color& getCouleurPieceSecondaire(int indicePiece) const;
+
+    void setData(int x, int y, int value);
+    void triggerPiece(int indice, int mouseX, int mouseY);
 };
 
 class AfficheurNiveau
@@ -26,13 +52,11 @@ private:
     static const sf::Color COULEUR_DU_SOL;
 
     sf::RenderWindow& fenetre;
-    const std::vector<Niveau> niveaux;
+    const std::vector<NiveauData> niveaux;
     int indiceNiveauActuel;
+    Niveau niveauActuel;
     int nbCol;
     int nbLigne;
-    std::vector<int> levelData;
-    std::vector<Piece> pieces;
-    std::vector<int> dataActuel;
 
     sf::RectangleShape *const panneauCentral = new sf::RectangleShape;
     std::vector<sf::Vector2f> treillis;
@@ -40,7 +64,7 @@ private:
     std::vector<sf::Vertex> sommetsSceneParticuliere;
 
 public:
-    AfficheurNiveau(sf::RenderWindow& fenetre, const std::vector<Niveau>& niveaux);
+    AfficheurNiveau(sf::RenderWindow& fenetre, const std::vector<NiveauData>& niveaux);
     void prochainNiveau();
     void allerAuNiveau(int indice);
     void dessiner();
@@ -49,7 +73,7 @@ private:
     void initialiseNiveau();
     void initialiseTrame();
     void genereTreillis();
-    void ajouterSommetsCellule(std::vector<sf::Vertex>& trame, int& x, int& y, const sf::Color& couleur);
+    void ajouteSommetsCellule(std::vector<sf::Vertex>& trame, int& x, int& y, const sf::Color& couleur);
 };
 
 #endif
