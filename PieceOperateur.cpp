@@ -3,7 +3,7 @@
 ///////////////////////////////////////
 //////// CLASSE PieceOperateur ////////
 
-PieceOperateur::PieceOperateur(const pair<int,int> &position)
+PieceOperateur::PieceOperateur(const std::pair<int,int> &position)
     : position{std::move(position)}
 {}
 
@@ -20,11 +20,11 @@ void PieceOperateur::accepter(const OperateurSymetrie &op) {
 /////////////////////////////////////////////
 //////// CLASSE OperateurDeplacement ////////
 
-OperateurDeplacement::OperateurDeplacement(const pair<int,int> &position, Orientation sens)
+OperateurDeplacement::OperateurDeplacement(const std::pair<int,int> &position, Orientation sens)
     : PieceOperateur{position}, sens{sens}
 {}
 
-void OperateurDeplacement::mapPosition(pair<int, int> &pos) const {
+void OperateurDeplacement::mapPosition(std::pair<int, int> &pos) const {
     switch (sens) {
         case NORD : pos.second--; break;
         case SUD : pos.second++; break;
@@ -80,11 +80,11 @@ void OperateurDeplacement::accepter(const OperateurSymetrie &op) {
 //////////////////////////////////////////
 //////// CLASSE OperateurRotation ////////
 
-OperateurRotation::OperateurRotation(const pair<int,int> &position, Orientation sens)
+OperateurRotation::OperateurRotation(const std::pair<int,int> &position, Orientation sens)
     : PieceOperateur{position}, sens{sens}
 {}
 
-void OperateurRotation::mapPosition(pair<int, int> &pos) const {
+void OperateurRotation::mapPosition(std::pair<int, int> &pos) const {
     switch (sens) {
         case HORAIRE :
             // Rotation 90° horarire : (x, y) -> (y, -x)
@@ -115,11 +115,11 @@ void OperateurRotation::accepter(const OperateurSymetrie &op) {
 //////////////////////////////////////////
 //////// CLASSE OperateurSymetrie ////////
 
-OperateurSymetrie::OperateurSymetrie(const pair<int,int> &position, Orientation sens)
+OperateurSymetrie::OperateurSymetrie(const std::pair<int,int> &position, Orientation sens)
     : PieceOperateur{position}, sens{sens}
 {}
 
-void OperateurSymetrie::mapPosition(pair<int, int> &pos) const {
+void OperateurSymetrie::mapPosition(std::pair<int, int> &pos) const {
     switch (sens) {
         case VERTICALE :
             // Réflexion par rapport à l'axe des y : (x, y) -> (-x, y)
