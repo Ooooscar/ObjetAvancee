@@ -9,17 +9,17 @@ PieceData::PieceData(const std::vector<pair<int, int>> &coords, const CouleurPie
     : coordinates{coords}, operateurs{}, couleur{couleur}
 {}
 
-OperateurDeplacement& PieceData::ajouteOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens) {
+OperateurDeplacement& PieceData::ajouterOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens) {
     OperateurDeplacement* op = new OperateurDeplacement{position, sens};
     operateurs.emplace_back(op);
     return *op;
 }
-OperateurRotation& PieceData::ajouteOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens) {
+OperateurRotation& PieceData::ajouterOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens) {
     OperateurRotation* op = new OperateurRotation{position, sens};
     operateurs.push_back(op);
     return *op;
 }
-OperateurSymetrie& PieceData::ajouteOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens) {
+OperateurSymetrie& PieceData::ajouterOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens) {
     OperateurSymetrie* op = new OperateurSymetrie{position, sens};
     operateurs.push_back(op);
     return *op;
@@ -42,16 +42,16 @@ const std::vector<pair<int, int>>& Piece::getCoordinates() const { return coordi
 const sf::Color& Piece::getCouleur() const { return couleur.first; }
 const sf::Color& Piece::getCouleurSecondaire() const { return couleur.second; }
 
-void Piece::trigger(int mouseX, int mouseY, std::vector<int> &casesActuelles) {
+void Piece::trigger(const std::pair<int, int> &caseChoisie, std::vector<int> &casesActuelles) {
     for (PieceOperateur *op : operateurs) {
-        if (mouseX == op->position.first && mouseY == op->position.second) {
+        if (caseChoisie == op->position) {
             std::cout << "GREAT" << std::endl;
-            accept(*op, casesActuelles);
+            accepter(*op, casesActuelles);
         }
     }
 }
 
-void Piece::accept(PieceOperateur &op, std::vector<int> &casesActuelles) {
+void Piece::accepter(PieceOperateur &op, std::vector<int> &casesActuelles) {
     int nbCol{8}; // TODO
     for (pair<int,int> &coord : coordinates) {
         casesActuelles[coord.second * nbCol + coord.first] = 0;

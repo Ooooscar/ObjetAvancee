@@ -10,12 +10,12 @@ class NiveauData
 protected:
     int nbCol;
     int nbLigne;
-    std::vector<int> casesAttendues;
+    std::vector<int> dataCasesAttendues;
     std::vector<PieceData> dataPieces;
 public:
     NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &casesAttendues);
     NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &&casesAttendues);
-    PieceData& ajoutePiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
+    PieceData& ajouterPiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
 };
 
 class Niveau : public NiveauData, public sf::Drawable
@@ -26,39 +26,27 @@ private:
     static const sf::Color COULEUR_DU_MUR;
     static const sf::Color COULEUR_DU_SOL;
 
-public:
     std::vector<Piece> pieces;
-private:
-    std::vector<int> casesActuelles;
+    std::vector<int> dataCasesActuelles;
     int nbCasesOccupees;
-public:
+
     sf::RectangleShape panneauCentral;
-private:
     std::vector<sf::Vector2f> treillis;
     std::vector<sf::Vertex> sommetsTrame;
 
 public:
     Niveau(const NiveauData &dataNiveau);
-    // const int getNbCol() const;
-    // const int getNbLigne() const;
-    // const int getNbPieces() const;
-    // const int getNbCasesOccupees() const;
-
-    // const int getDataActuelleParIndice(int indice) const;
-    const int getDataActuelle(int x, int y) const;
-    // const int getDataAttendueParIndice(int indice) const;
-    const int getDataAttendue(int x, int y) const;
-    // const sf::Color& getCouleur(int indicePiece) const;
-    // const sf::Color& getCouleurSecondaire(int indicePiece) const;
-
-    void setData(int x, int y, int value);
-    void triggerPiece(int indice, int mouseX, int mouseY);
-
+    const int getDataActuelle(const std::pair<int, int> &caseChoisie) const;
+    const int getDataAttendue(const std::pair<int, int> &caseChoisie) const;
+    void triggerPiece(int indice, const std::pair<int, int> &caseChoisie);
+    void redefinirData(const std::pair<int, int> &caseChoisie, int valeur);
+    
+    const bool contient(const sf::Vector2f& posSouris) const;
+    std::pair<int, int> mapPixelsEnCases(const sf::Vector2f& posSouris) const;
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
-
 private:
-    void genereTreillis();
-    void ajouteSommetsCellule(std::vector<sf::Vertex>& trame, int x, int y, const sf::Color& couleur);
+    void genererTreillis();
+    void ajouterSommetsCellule(std::vector<sf::Vertex>& trame, int x, int y, const sf::Color& couleur);
 };
 
 class AfficheurNiveau

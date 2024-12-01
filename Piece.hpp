@@ -25,9 +25,9 @@ protected:
 	CouleurPiece couleur;
 public:
 	PieceData(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
-	OperateurDeplacement& ajouteOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens);
-	OperateurRotation& ajouteOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens);
-	OperateurSymetrie& ajouteOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens);
+	OperateurDeplacement& ajouterOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens);
+	OperateurRotation& ajouterOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens);
+	OperateurSymetrie& ajouterOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens);
 };
 
 class Piece : public PieceData, public sf::Drawable
@@ -44,8 +44,8 @@ public:
     const sf::Color& getCouleur() const;
     const sf::Color& getCouleurSecondaire() const;
 
-	void trigger(int mouseX, int mouseY, std::vector<int> &casesActuelles);
-	void accept(PieceOperateur &op, std::vector<int> &casesActuelles);
+	void trigger(const std::pair<int, int> &caseChoisie, std::vector<int> &casesActuelles);
+	void accepter(PieceOperateur &op, std::vector<int> &casesActuelles);
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 };
 

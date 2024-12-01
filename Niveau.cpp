@@ -4,14 +4,14 @@
 ///////////////////////////////////
 //////// CLASSE NiveauData ////////
 
-NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &casesAttendues)
-	: nbCol{nbCol}, nbLigne{nbLigne}, casesAttendues{casesAttendues}, dataPieces{}
+NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &dataCasesAttendues)
+	: nbCol{nbCol}, nbLigne{nbLigne}, dataCasesAttendues{dataCasesAttendues}, dataPieces{}
 {}
-NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &&casesAttendues)
-	: nbCol{nbCol}, nbLigne{nbLigne}, casesAttendues{casesAttendues}, dataPieces{}
+NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &&dataCasesAttendues)
+	: nbCol{nbCol}, nbLigne{nbLigne}, dataCasesAttendues{dataCasesAttendues}, dataPieces{}
 {}
 
-PieceData& NiveauData::ajoutePiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur) {
+PieceData& NiveauData::ajouterPiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur) {
 	dataPieces.emplace_back(PieceData{coords, couleur});
 	return dataPieces.back();
 }
@@ -27,17 +27,16 @@ const sf::Color Niveau::COULEUR_DU_SOL = sf::Color{0xFFFFFCFF};
 //////// CONSTRUCTEURS ////////
 
 Niveau::Niveau(const NiveauData &dataNiveau)
-	: NiveauData{dataNiveau}, pieces{}, casesActuelles{}, nbCasesOccupees{0},
+	: NiveauData{dataNiveau}, pieces{}, dataCasesActuelles{}, nbCasesOccupees{0},
 		panneauCentral{sf::RectangleShape(sf::Vector2f(nbCol * TILE_SIZE, nbLigne * TILE_SIZE))},
 		treillis{}, sommetsTrame{}
 {
 	panneauCentral.setPosition(MARGIN_LEFT, MARGIN_TOP);
 	panneauCentral.setFillColor(COULEUR_DU_SOL);
-	genereTreillis();
+	genererTreillis();
 
 	pieces.reserve(dataPieces.size());
 	for (const PieceData &dataPiece : dataPieces) {
-		// pieces.emplace_back(Piece(static_cast<int>(pieces.size()), dataPiece, aff));
 		pieces.emplace_back(Piece(static_cast<int>(pieces.size()), dataPiece, {}));
 	}
 
@@ -45,70 +44,69 @@ Niveau::Niveau(const NiveauData &dataNiveau)
 	int indiceCellule = 0;
 	for (int y = 0; y < nbLigne; ++y) {
 		for (int x = 0; x < nbCol; ++x) {
-			int dataAttendue = casesAttendues[indiceCellule];
-			switch (dataAttendue) {
+			int getDataAttendue = dataCasesAttendues[indiceCellule];
+			switch (getDataAttendue) {
 				case 0 :
 					break;
 				case 1 :
-					ajouteSommetsCellule(sommetsTrame, x, y, COULEUR_DU_MUR);
+					ajouterSommetsCellule(sommetsTrame, x, y, COULEUR_DU_MUR);
 					break;
 				default	:
-					int indicePiece = dataAttendue - 2;
+					int indicePiece = getDataAttendue - 2;
 					if (indicePiece < static_cast<int>(pieces.size()))
-						ajouteSommetsCellule(sommetsTrame, x, y, pieces[indicePiece].getCouleurSecondaire());
+						ajouterSommetsCellule(sommetsTrame, x, y, pieces[indicePiece].getCouleurSecondaire());
 					break;
 			}
 			++indiceCellule;
 		}
 	}
 
-	casesActuelles.reserve(casesAttendues.size());
-	// Recopier les positions des murs de `casesAttendues` dans `casesActuelles`
-	for (int dataCase : casesAttendues) {
-		casesActuelles.emplace_back((dataCase == 1) ? 1 : 0);
+	dataCasesActuelles.reserve(dataCasesAttendues.size());
+	// Recopier les positions des murs de `dataCasesAttendues` dans `dataCasesActuelles`
+	for (int dataCase : dataCasesAttendues) {
+		dataCasesActuelles.emplace_back((dataCase == 1) ? 1 : 0);
 	}
 
-	// Écriver les positions des `Piece` dans `casesActuelles`
+	// Écriver les positions des `Piece` dans `dataCasesActuelles`
 	for (Piece &piece : pieces) {
 		piece.sommets.reserve(piece.getCoordinates().size() * 6);
-		for (const std::pair<int, int> &coord : piece.getCoordinates()) {
-			setData(coord.first, coord.second, piece.getIndice() + 2);
-			ajouteSommetsCellule(piece.sommets, coord.first, coord.second, piece.getCouleur());
+		for (const std::pair<int, int> &caseOccupee : piece.getCoordinates()) {
+			redefinirData(caseOccupee, piece.getIndice() + 2);
+			ajouterSommetsCellule(piece.sommets, caseOccupee.first, caseOccupee.second, piece.getCouleur());
 		}
 	}
 }
 
 //////// METHODES PUBLICS ////////
 
-// const int Niveau::getNbCol() const { return nbCol; }
-// const int Niveau::getNbLigne() const { return nbLigne; }
-// const int Niveau::getNbPieces() const { return static_cast<int>(pieces.size()); }
-// const int Niveau::getNbCasesOccupees() const { return nbCasesOccupees; }
-
-// const int Niveau::getDataActuelleParIndice(int indice) const { return casesActuelles[indice]; }
-const int Niveau::getDataActuelle(int x, int y) const { return casesActuelles[y * nbCol + x]; }
-// const int Niveau::getDataAttendueParIndice(int indice) const { return casesAttendues[indice]; }
-const int Niveau::getDataAttendue(int x, int y) const { return casesAttendues[y * nbCol + x]; }
-
-// const sf::Color& Niveau::getCouleur(int indicePiece) const {
-// 	return pieces[indicePiece].getCouleur();
-// }
-// const sf::Color& Niveau::getCouleurSecondaire(int indicePiece) const {
-// 	return pieces[indicePiece].getCouleurSecondaire();
-// }
-
-void Niveau::setData(int x, int y, int value) {
-	casesActuelles[y * nbCol + x] = value;
+const int Niveau::getDataActuelle(const std::pair<int, int> &caseChoisie) const {
+	return dataCasesActuelles[caseChoisie.second * nbCol + caseChoisie.first];
+}
+const int Niveau::getDataAttendue(const std::pair<int, int> &caseChoisie) const {
+	return dataCasesAttendues[caseChoisie.second * nbCol + caseChoisie.first];
 }
 
-void Niveau::triggerPiece(int indice, int coordX, int coordY) {
-	pieces[indice].trigger(coordX, coordY, casesActuelles);
+const bool Niveau::contient(const sf::Vector2f& posSouris) const {
+	return panneauCentral.getGlobalBounds().contains(posSouris);
+}
+std::pair<int, int> Niveau::mapPixelsEnCases(const sf::Vector2f& posSouris) const {
+	sf::Vector2f topLeft = panneauCentral.getPosition();
+	return std::make_pair<int>( static_cast<int>((posSouris.x - topLeft.x) / TILE_SIZE),
+		                        static_cast<int>((posSouris.y - topLeft.y) / TILE_SIZE) );
+}
+
+void Niveau::redefinirData(const std::pair<int, int> &caseChoisie, int valeur) {
+	dataCasesActuelles[caseChoisie.second * nbCol + caseChoisie.first] = valeur;
+}
+
+void Niveau::triggerPiece(int indice, const std::pair<int, int> &caseChoisie) {
+	pieces[indice].trigger(caseChoisie, dataCasesActuelles);
 
 	// TODO
 	pieces[indice].sommets.clear();
-	for (const std::pair<int, int> &coord : pieces[indice].getCoordinates()) {
-		setData(coord.first, coord.second, indice + 2);
-		ajouteSommetsCellule(pieces[indice].sommets, coord.first, coord.second, pieces[indice].getCouleur());
+	for (const std::pair<int, int> &caseOccupee : pieces[indice].getCoordinates()) {
+		redefinirData(caseOccupee, indice + 2);
+		ajouterSommetsCellule(pieces[indice].sommets, caseOccupee.first, caseOccupee.second, pieces[indice].getCouleur());
 	}
 }
 
@@ -123,8 +121,7 @@ void Niveau::draw(sf::RenderTarget &target, sf::RenderStates states) const {
 
 //////// METHODES PRIVEES ////////
 
-void Niveau::genereTreillis()
-{
+void Niveau::genererTreillis() {
 	std::vector<sf::Vector2f>{}.swap(treillis);
 	treillis.reserve((nbCol + 1) * (nbLigne + 1));
 	for (int y = MARGIN_TOP; y <= MARGIN_TOP + nbLigne * TILE_SIZE; y += TILE_SIZE) {
@@ -134,8 +131,7 @@ void Niveau::genereTreillis()
 	}
 }
 
-void Niveau::ajouteSommetsCellule(std::vector<sf::Vertex>& trame, int x, int y, const sf::Color& couleur)
-{
+void Niveau::ajouterSommetsCellule(std::vector<sf::Vertex>& trame, int x, int y, const sf::Color& couleur) {
 	int indiceCellulePlusY{y*(nbCol+1) + x};
 	trame.emplace_back(sf::Vertex(treillis[indiceCellulePlusY], couleur));
 	trame.emplace_back(sf::Vertex(treillis[indiceCellulePlusY+1], couleur));
@@ -159,37 +155,31 @@ AfficheurNiveau::AfficheurNiveau(sf::RenderWindow &fenetre, const std::vector<Ni
 
 //////// METHODES PUBLICS ////////
 
-void AfficheurNiveau::prochainNiveau()
-{
+void AfficheurNiveau::prochainNiveau() {
     allerAuNiveau(indiceNiveauActuel + 1);
 }
-
-void AfficheurNiveau::allerAuNiveau(int indice)
-{
+void AfficheurNiveau::allerAuNiveau(int indice) {
     indiceNiveauActuel = indice;
 	niveauActuel = Niveau(niveaux[indiceNiveauActuel]);
 }
 
 void AfficheurNiveau::demarrer()
 {
-
 	// Opérations graphiques générales
 	while (fenetre.isOpen())
 	{
-		int coordX{-1};
-		int coordY{-1};
-		sf::Vector2i mousePos = sf::Mouse::getPosition(fenetre);
-		sf::Vector2f mouseWorldPos = fenetre.mapPixelToCoords(mousePos);
+		std::pair<int, int> caseChoisie{-1, -1};
+		sf::Vector2i posSourisAbsolue{sf::Mouse::getPosition(fenetre)};
+		// important, si on redimensionne la fenêtre...
+		sf::Vector2f posSouris{fenetre.mapPixelToCoords(posSourisAbsolue)};
 		std::string message = "Mouse Position: ("
-							+ std::to_string(int(mouseWorldPos.x)) + ", "
-							+ std::to_string(int(mouseWorldPos.y)) + ")";
-		bool sourisSurNiveau{niveauActuel.panneauCentral.getGlobalBounds().contains(mouseWorldPos)};
+							+ std::to_string(int(posSouris.x)) + ", "
+							+ std::to_string(int(posSouris.y)) + ")";
+		bool sourisSurNiveau{niveauActuel.contient(posSouris)};
 		if (sourisSurNiveau)
 		{
-			sf::Vector2f topLeft = niveauActuel.panneauCentral.getPosition(); // TODO
-			coordX = static_cast<int>((mouseWorldPos.x - topLeft.x) / TILE_SIZE);
-			coordY = static_cast<int>((mouseWorldPos.y - topLeft.y) / TILE_SIZE);
-			message += " case :" + std::to_string(coordX) + " ; " + std::to_string(coordY);
+			caseChoisie = niveauActuel.mapPixelsEnCases(posSouris);
+			message += " case :" + std::to_string(caseChoisie.first) + " ; " + std::to_string(caseChoisie.second);
 		}
 		fenetre.setTitle(message);
 		
@@ -204,11 +194,11 @@ void AfficheurNiveau::demarrer()
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left 
 				&& sourisSurNiveau)
 			{
-				std::cout << "trigger " << coordX << " " << coordY << std::endl;
-				int indicePiece = niveauActuel.getDataActuelle(coordX, coordY) - 2;
+				std::cout << "trigger " << caseChoisie.first << " " << caseChoisie.second << std::endl;
+				int indicePiece = niveauActuel.getDataActuelle(caseChoisie) - 2;
 				if (indicePiece >= 0)
 				{
-					niveauActuel.triggerPiece(indicePiece, coordX, coordY);
+					niveauActuel.triggerPiece(indicePiece, caseChoisie);
 				}
 			}
         }

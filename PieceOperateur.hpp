@@ -16,9 +16,9 @@ public:
 	virtual void mapPosition(pair<int, int> &pos) const = 0;
 	virtual void mapOperateur(PieceOperateur &op) const = 0;
 
-	virtual void accept(const OperateurDeplacement &op);
-	virtual void accept(const OperateurRotation &op);
-	virtual void accept(const OperateurSymetrie &op);
+	virtual void accepter(const OperateurDeplacement &op);
+	virtual void accepter(const OperateurRotation &op);
+	virtual void accepter(const OperateurSymetrie &op);
 	// virtual void visit(PieceData &p) const;
 	
 	// virtual void visit(OperateurDeplacement &) const = 0;
@@ -37,8 +37,8 @@ public:
 	virtual void mapPosition(pair<int, int> &pos) const;
 	virtual void mapOperateur(PieceOperateur &op) const;
 
-	virtual void accept(const OperateurRotation &op);
-	virtual void accept(const OperateurSymetrie &op);
+	virtual void accepter(const OperateurRotation &op);
+	virtual void accepter(const OperateurSymetrie &op);
 };
 
 class OperateurRotation : public PieceOperateur
@@ -52,7 +52,7 @@ public:
 	virtual void mapPosition(pair<int, int> &pos) const;
 	virtual void mapOperateur(PieceOperateur &op) const;
 
-	virtual void accept(const OperateurSymetrie &op);
+	virtual void accepter(const OperateurSymetrie &op);
 };
 
 class OperateurSymetrie : public PieceOperateur
@@ -65,7 +65,7 @@ public:
 	virtual void mapPosition(pair<int, int> &pos) const;
 	virtual void mapOperateur(PieceOperateur &op) const;
 
-	virtual void accept(const OperateurRotation &op);
+	virtual void accepter(const OperateurRotation &op);
 };
 
 #endif

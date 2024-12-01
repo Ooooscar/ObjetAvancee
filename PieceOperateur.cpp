@@ -7,13 +7,13 @@ PieceOperateur::PieceOperateur(const pair<int,int> &position)
     : position{std::move(position)}
 {}
 
-void PieceOperateur::accept(const OperateurDeplacement &op) {
+void PieceOperateur::accepter(const OperateurDeplacement &op) {
     op.mapPosition(position);
 }
-void PieceOperateur::accept(const OperateurRotation &op) {
+void PieceOperateur::accepter(const OperateurRotation &op) {
     op.mapPosition(position);
 };
-void PieceOperateur::accept(const OperateurSymetrie &op) {
+void PieceOperateur::accepter(const OperateurSymetrie &op) {
     op.mapPosition(position);
 };
 
@@ -33,11 +33,11 @@ void OperateurDeplacement::mapPosition(pair<int, int> &pos) const {
     }
 }
 void OperateurDeplacement::mapOperateur(PieceOperateur &op) const {
-    op.accept(*this);
+    op.accepter(*this);
 }
 
-void OperateurDeplacement::accept(const OperateurRotation &op) {
-    PieceOperateur::accept(op);
+void OperateurDeplacement::accepter(const OperateurRotation &op) {
+    PieceOperateur::accepter(op);
     switch (op.sens) {
         case OperateurRotation::HORAIRE :
             switch (sens) {
@@ -57,8 +57,8 @@ void OperateurDeplacement::accept(const OperateurRotation &op) {
             break;
     }
 }
-void OperateurDeplacement::accept(const OperateurSymetrie &op) {
-    PieceOperateur::accept(op);
+void OperateurDeplacement::accepter(const OperateurSymetrie &op) {
+    PieceOperateur::accepter(op);
     switch (op.sens) {
         case OperateurSymetrie::VERTICALE :
             switch (sens) {
@@ -104,11 +104,11 @@ void OperateurRotation::mapPosition(pair<int, int> &pos) const {
     }
 }
 void OperateurRotation::mapOperateur(PieceOperateur &op) const {
-    op.accept(*this);
+    op.accepter(*this);
 }
 
-void OperateurRotation::accept(const OperateurSymetrie &op) {
-    PieceOperateur::accept(op);
+void OperateurRotation::accepter(const OperateurSymetrie &op) {
+    PieceOperateur::accepter(op);
     sens = (sens == HORAIRE) ? ANTIHORAIRE : HORAIRE;
 }
 
@@ -132,10 +132,10 @@ void OperateurSymetrie::mapPosition(pair<int, int> &pos) const {
     }
 }
 void OperateurSymetrie::mapOperateur(PieceOperateur &op) const {
-    op.accept(*this);
+    op.accepter(*this);
 }
 
-void OperateurSymetrie::accept(const OperateurRotation &op) {
-    PieceOperateur::accept(op);
+void OperateurSymetrie::accepter(const OperateurRotation &op) {
+    PieceOperateur::accepter(op);
     sens = (sens == VERTICALE) ? HORIZONTALE : VERTICALE;
 }

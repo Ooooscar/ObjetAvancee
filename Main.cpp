@@ -23,10 +23,10 @@ int main()
 		}
 	};
 
-	PieceData &p1 = niveaux[0].ajoutePiece({{1,1},{2,1},{2,2},{3,2}}, CouleurPiece::VERT);
-	p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::SUD);
-	p1.ajouteOpDeplacement({3,2}, OperateurDeplacement::EST);
-	p1.ajouteOpRotation({2,1}, OperateurRotation::ANTIHORAIRE);
+	PieceData &p1 = niveaux[0].ajouterPiece({{1,1},{2,1},{2,2},{3,2}}, CouleurPiece::VERT);
+	p1.ajouterOpDeplacement({1,1}, OperateurDeplacement::SUD);
+	p1.ajouterOpDeplacement({3,2}, OperateurDeplacement::EST);
+	p1.ajouterOpRotation({2,1}, OperateurRotation::ANTIHORAIRE);
 
 	AfficheurNiveau afficheurNiveau{window, niveaux};
     afficheurNiveau.demarrer();
