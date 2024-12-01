@@ -6,7 +6,7 @@
 //////// CLASSE PieceData ////////
 
 PieceData::PieceData(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur)
-    : coordinates{coords}, operateurs{}, couleur{couleur}
+    : coordonnees{coords}, operateurs{}, couleur{couleur}
 {}
 
 OperateurDeplacement& PieceData::ajouterOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens) {
@@ -38,7 +38,7 @@ Piece::Piece(int indice, const PieceData &dataPiece, const std::vector<sf::Verte
 {}
 
 const int Piece::getIndice() const { return indice; }
-const std::vector<pair<int, int>>& Piece::getCoordinates() const { return coordinates; }
+const std::vector<pair<int, int>>& Piece::getCoordonnees() const { return coordonnees; }
 const sf::Color& Piece::getCouleur() const { return couleur.first; }
 const sf::Color& Piece::getCouleurSecondaire() const { return couleur.second; }
 
@@ -52,10 +52,10 @@ void Piece::trigger(const std::pair<int, int> &caseChoisie, std::vector<int> &da
 
 void Piece::accepter(PieceOperateur &op, std::vector<int> &dataCasesActuelles) {
     int nbCol{8}; // TODO
-    for (pair<int,int> &coord : coordinates) {
+    for (pair<int,int> &coord : coordonnees) {
         dataCasesActuelles[coord.second * nbCol + coord.first] = 0;
     }
-    for (pair<int,int> &coord : coordinates) {
+    for (pair<int,int> &coord : coordonnees) {
         op.mapPosition(coord);
         dataCasesActuelles[coord.second * nbCol + coord.first] = indice + 2;
     }

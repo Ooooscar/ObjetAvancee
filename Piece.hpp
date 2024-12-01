@@ -20,7 +20,7 @@ public:
 class PieceData
 {
 protected:
-	std::vector<pair<int, int>> coordinates;
+	std::vector<pair<int, int>> coordonnees;
 	std::vector<PieceOperateur*> operateurs;
 	CouleurPiece couleur;
 public:
@@ -40,7 +40,7 @@ public:
 	Piece(int indice, const PieceData &dataPiece, const std::vector<sf::Vertex> &sommets);
 	// Piece(int indice, const PieceData &dataPiece, const AfficheurNiveau &aff);
 	const int getIndice() const;
-	const std::vector<pair<int, int>>& getCoordinates() const;
+	const std::vector<pair<int, int>>& getCoordonnees() const;
     const sf::Color& getCouleur() const;
     const sf::Color& getCouleurSecondaire() const;
 

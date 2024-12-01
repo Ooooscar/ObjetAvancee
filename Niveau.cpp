@@ -69,8 +69,8 @@ Niveau::Niveau(const NiveauData &dataNiveau)
 
 	// Écriver les positions des `Piece` dans `dataCasesActuelle`
 	for (Piece &piece : pieces) {
-		piece.sommets.reserve(piece.getCoordinates().size() * 6);
-		for (const std::pair<int, int> &caseOccupee : piece.getCoordinates()) {
+		piece.sommets.reserve(piece.getCoordonnees().size() * 6);
+		for (const std::pair<int, int> &caseOccupee : piece.getCoordonnees()) {
 			redefinirData(caseOccupee, piece.getIndice() + 2);
 			ajouterSommetsCellule(piece.sommets, caseOccupee.first, caseOccupee.second, piece.getCouleur());
 		}
@@ -104,7 +104,7 @@ void Niveau::triggerPiece(int indice, const std::pair<int, int> &caseChoisie) {
 
 	// TODO
 	pieces[indice].sommets.clear();
-	for (const std::pair<int, int> &caseOccupee : pieces[indice].getCoordinates()) {
+	for (const std::pair<int, int> &caseOccupee : pieces[indice].getCoordonnees()) {
 		redefinirData(caseOccupee, indice + 2);
 		ajouterSommetsCellule(pieces[indice].sommets, caseOccupee.first, caseOccupee.second, pieces[indice].getCouleur());
 	}
