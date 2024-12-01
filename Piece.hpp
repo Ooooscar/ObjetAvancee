@@ -47,8 +47,8 @@ public:
     const sf::Color& getCouleur() const;
     const sf::Color& getCouleurSecondaire() const;
 
-	void trigger(const std::pair<int, int> &caseChoisie, std::vector<int> &casesActuelles);
-	void accepter(PieceOperateur &op, std::vector<int> &casesActuelles);
+	void trigger(const std::pair<int, int> &caseChoisie);
+	void accepter(PieceOperateur &op);
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 };
 

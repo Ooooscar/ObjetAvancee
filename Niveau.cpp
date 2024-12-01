@@ -100,14 +100,7 @@ void Niveau::redefinirData(const std::pair<int, int> &caseChoisie, int valeur) {
 }
 
 void Niveau::triggerPiece(int indice, const std::pair<int, int> &caseChoisie) {
-	pieces[indice].trigger(caseChoisie, dataCasesActuelle);
-
-	// TODO
-	pieces[indice].sommets.clear();
-	for (const std::pair<int, int> &caseOccupee : pieces[indice].getCoordonnees()) {
-		redefinirData(caseOccupee, indice + 2);
-		ajouterSommetsCellule(pieces[indice].sommets, caseOccupee.first, caseOccupee.second, pieces[indice].getCouleur());
-	}
+	pieces[indice].trigger(caseChoisie);
 }
 
 void Niveau::draw(sf::RenderTarget &target, sf::RenderStates states) const {

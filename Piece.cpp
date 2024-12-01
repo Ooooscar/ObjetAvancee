@@ -38,22 +38,25 @@ const std::vector<std::pair<int, int>>& Piece::getCoordonnees() const { return c
 const sf::Color& Piece::getCouleur() const { return couleur.first; }
 const sf::Color& Piece::getCouleurSecondaire() const { return couleur.second; }
 
-void Piece::trigger(const std::pair<int, int> &caseChoisie, std::vector<int> &dataCasesActuelles) {
+void Piece::trigger(const std::pair<int, int> &caseChoisie) {
     for (PieceOperateur *op : operateurs) {
         if (caseChoisie == op->position) {
-            accepter(*op, dataCasesActuelles);
+            accepter(*op);
         }
     }
+    
 }
 
-void Piece::accepter(PieceOperateur &op, std::vector<int> &dataCasesActuelles) {
-    for (std::pair<int,int> &coord : coordonnees) {
-        dataCasesActuelles[coord.second * niveau.nbCol + coord.first] = 0;
+void Piece::accepter(PieceOperateur &op) {
+    sommets.clear();
+    for (const std::pair<int, int> &caseOccupee : coordonnees) {
+        niveau.redefinirData(caseOccupee, 0);
     }
-    for (std::pair<int,int> &coord : coordonnees) {
-        op.mapPosition(coord);
-        dataCasesActuelles[coord.second * niveau.nbCol + coord.first] = indice + 2;
-    }
+	for (std::pair<int, int> &caseOccupee : coordonnees) {
+        op.mapPosition(caseOccupee);
+		niveau.redefinirData(caseOccupee, indice + 2);
+		niveau.ajouterSommetsCellule(sommets, caseOccupee.first, caseOccupee.second, getCouleur());
+	}
     for (PieceOperateur *otherOp : operateurs) {
         op.mapOperateur(*otherOp);
     }
