@@ -4,11 +4,11 @@
 ///////////////////////////////////
 //////// CLASSE NiveauData ////////
 
-NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &dataCasesAttendues)
-	: nbCol{nbCol}, nbLigne{nbLigne}, dataCasesAttendues{dataCasesAttendues}, dataPieces{}
+NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &dataCasesAttendue)
+	: nbCol{nbCol}, nbLigne{nbLigne}, dataCasesAttendue{dataCasesAttendue}, dataPieces{}
 {}
-NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &&dataCasesAttendues)
-	: nbCol{nbCol}, nbLigne{nbLigne}, dataCasesAttendues{dataCasesAttendues}, dataPieces{}
+NiveauData::NiveauData(const int nbCol, const int nbLigne, std::vector<int> &&dataCasesAttendue)
+	: nbCol{nbCol}, nbLigne{nbLigne}, dataCasesAttendue{dataCasesAttendue}, dataPieces{}
 {}
 
 PieceData& NiveauData::ajouterPiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur) {
@@ -27,7 +27,7 @@ const sf::Color Niveau::COULEUR_DU_SOL = sf::Color{0xFFFFFCFF};
 //////// CONSTRUCTEURS ////////
 
 Niveau::Niveau(const NiveauData &dataNiveau)
-	: NiveauData{dataNiveau}, pieces{}, dataCasesActuelles{}, nbCasesOccupees{0},
+	: NiveauData{dataNiveau}, pieces{}, dataCasesActuelle{}, nbCasesOccupees{0},
 		panneauCentral{sf::RectangleShape(sf::Vector2f(nbCol * TILE_SIZE, nbLigne * TILE_SIZE))},
 		treillis{}, sommetsTrame{}
 {
@@ -44,7 +44,7 @@ Niveau::Niveau(const NiveauData &dataNiveau)
 	int indiceCellule = 0;
 	for (int y = 0; y < nbLigne; ++y) {
 		for (int x = 0; x < nbCol; ++x) {
-			int getDataAttendue = dataCasesAttendues[indiceCellule];
+			int getDataAttendue = dataCasesAttendue[indiceCellule];
 			switch (getDataAttendue) {
 				case 0 :
 					break;
@@ -61,13 +61,13 @@ Niveau::Niveau(const NiveauData &dataNiveau)
 		}
 	}
 
-	dataCasesActuelles.reserve(dataCasesAttendues.size());
-	// Recopier les positions des murs de `dataCasesAttendues` dans `dataCasesActuelles`
-	for (int dataCase : dataCasesAttendues) {
-		dataCasesActuelles.emplace_back((dataCase == 1) ? 1 : 0);
+	dataCasesActuelle.reserve(dataCasesAttendue.size());
+	// Recopier les positions des murs de `dataCasesAttendue` dans `dataCasesActuelle`
+	for (int dataCase : dataCasesAttendue) {
+		dataCasesActuelle.emplace_back((dataCase == 1) ? 1 : 0);
 	}
 
-	// Écriver les positions des `Piece` dans `dataCasesActuelles`
+	// Écriver les positions des `Piece` dans `dataCasesActuelle`
 	for (Piece &piece : pieces) {
 		piece.sommets.reserve(piece.getCoordinates().size() * 6);
 		for (const std::pair<int, int> &caseOccupee : piece.getCoordinates()) {
@@ -80,10 +80,10 @@ Niveau::Niveau(const NiveauData &dataNiveau)
 //////// METHODES PUBLICS ////////
 
 const int Niveau::getDataActuelle(const std::pair<int, int> &caseChoisie) const {
-	return dataCasesActuelles[caseChoisie.second * nbCol + caseChoisie.first];
+	return dataCasesActuelle[caseChoisie.second * nbCol + caseChoisie.first];
 }
 const int Niveau::getDataAttendue(const std::pair<int, int> &caseChoisie) const {
-	return dataCasesAttendues[caseChoisie.second * nbCol + caseChoisie.first];
+	return dataCasesAttendue[caseChoisie.second * nbCol + caseChoisie.first];
 }
 
 const bool Niveau::contient(const sf::Vector2f& posSouris) const {
@@ -96,11 +96,11 @@ std::pair<int, int> Niveau::mapPixelsEnCases(const sf::Vector2f& posSouris) cons
 }
 
 void Niveau::redefinirData(const std::pair<int, int> &caseChoisie, int valeur) {
-	dataCasesActuelles[caseChoisie.second * nbCol + caseChoisie.first] = valeur;
+	dataCasesActuelle[caseChoisie.second * nbCol + caseChoisie.first] = valeur;
 }
 
 void Niveau::triggerPiece(int indice, const std::pair<int, int> &caseChoisie) {
-	pieces[indice].trigger(caseChoisie, dataCasesActuelles);
+	pieces[indice].trigger(caseChoisie, dataCasesActuelle);
 
 	// TODO
 	pieces[indice].sommets.clear();

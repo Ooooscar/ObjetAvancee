@@ -42,23 +42,22 @@ const std::vector<pair<int, int>>& Piece::getCoordinates() const { return coordi
 const sf::Color& Piece::getCouleur() const { return couleur.first; }
 const sf::Color& Piece::getCouleurSecondaire() const { return couleur.second; }
 
-void Piece::trigger(const std::pair<int, int> &caseChoisie, std::vector<int> &casesActuelles) {
+void Piece::trigger(const std::pair<int, int> &caseChoisie, std::vector<int> &dataCasesActuelles) {
     for (PieceOperateur *op : operateurs) {
         if (caseChoisie == op->position) {
-            std::cout << "GREAT" << std::endl;
-            accepter(*op, casesActuelles);
+            accepter(*op, dataCasesActuelles);
         }
     }
 }
 
-void Piece::accepter(PieceOperateur &op, std::vector<int> &casesActuelles) {
+void Piece::accepter(PieceOperateur &op, std::vector<int> &dataCasesActuelles) {
     int nbCol{8}; // TODO
     for (pair<int,int> &coord : coordinates) {
-        casesActuelles[coord.second * nbCol + coord.first] = 0;
+        dataCasesActuelles[coord.second * nbCol + coord.first] = 0;
     }
     for (pair<int,int> &coord : coordinates) {
         op.mapPosition(coord);
-        casesActuelles[coord.second * nbCol + coord.first] = indice + 2;
+        dataCasesActuelles[coord.second * nbCol + coord.first] = indice + 2;
     }
     for (PieceOperateur *otherOp : operateurs) {
         op.mapOperateur(*otherOp);

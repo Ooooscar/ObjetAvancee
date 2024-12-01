@@ -10,11 +10,11 @@ class NiveauData
 protected:
     int nbCol;
     int nbLigne;
-    std::vector<int> dataCasesAttendues;
+    std::vector<int> dataCasesAttendue;
     std::vector<PieceData> dataPieces;
 public:
-    NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &casesAttendues);
-    NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &&casesAttendues);
+    NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &casesAttendue);
+    NiveauData(const int nbCol, const int nbLigne, std::vector<int> &&casesAttendue);
     PieceData& ajouterPiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
 };
 
@@ -27,7 +27,7 @@ private:
     static const sf::Color COULEUR_DU_SOL;
 
     std::vector<Piece> pieces;
-    std::vector<int> dataCasesActuelles;
+    std::vector<int> dataCasesActuelle;
     int nbCasesOccupees;
 
     sf::RectangleShape panneauCentral;
