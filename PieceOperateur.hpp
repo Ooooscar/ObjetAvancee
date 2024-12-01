@@ -9,7 +9,7 @@ class OperateurSymetrie;
 
 class PieceOperateur
 {
-protected:
+public:
 	pair<int, int> position;
 public:
 	PieceOperateur(const pair<int,int> &position);

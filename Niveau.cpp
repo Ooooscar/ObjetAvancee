@@ -58,6 +58,7 @@ void AfficheurNiveau::dessiner()
     fenetre.draw(&sommetsTrame[0], sommetsTrame.size(), sf::Triangles);
 
 	// Scène particulière (les pièces concrètes)
+	sommetsSceneParticuliere.clear();
 	for (Piece p : pieces) {
 		for (std::pair<int,int> coord : p.coordinates) {
 			ajouterSommetsCellule(sommetsSceneParticuliere, coord.first, coord.second, p.couleur.first);
@@ -68,19 +69,14 @@ void AfficheurNiveau::dessiner()
 
 void AfficheurNiveau::demarrer()
 {
-	std::vector<sf::Drawable*> scene_particuliere;
-
-	// on place ici la définition d'une texture rouge, probablement qu'il y a mieux à faire (flightweight ? map ?)
-   	sf::Texture texture_rouge;
-	if (!texture_rouge.loadFromFile("texture.jpg"))
-	{
-		throw std::runtime_error("Erreur lors du chargement de l'image");
-	}
+	// for (int i : dataActuel)
+	// 	std::cout << i;
+	// std::cout << std::endl;
 
 	// Opérations graphiques générales
 	while (fenetre.isOpen())
 	{
-		float trig_x = -1, trig_y = -1;
+		int mouseX = -1, mouseY = -1;
 		sf::Vector2i mousePos = sf::Mouse::getPosition(fenetre);
 		sf::Vector2f mouseWorldPos = fenetre.mapPixelToCoords(mousePos);
 		std::string message = "Mouse Position: ("
@@ -89,9 +85,9 @@ void AfficheurNiveau::demarrer()
 		if (panneauCentral->getGlobalBounds().contains(mouseWorldPos))
 		{
 			sf::Vector2f topLeft = panneauCentral->getPosition();
-			trig_x = (mouseWorldPos.x - topLeft.x) / TILE_SIZE;
-			trig_y = (mouseWorldPos.y - topLeft.y) / TILE_SIZE;
-			message += " case :" + std::to_string(trig_x) + " ; " + std::to_string(trig_y);
+			mouseX = static_cast<int>((mouseWorldPos.x - topLeft.x) / TILE_SIZE);
+			mouseY = static_cast<int>((mouseWorldPos.y - topLeft.y) / TILE_SIZE);
+			message += " case :" + std::to_string(mouseX) + " ; " + std::to_string(mouseY);
 		}
 		fenetre.setTitle(message);
 		
@@ -107,16 +103,12 @@ void AfficheurNiveau::demarrer()
 				&& event.mouseButton.button == sf::Mouse::Left 
 				&& panneauCentral->getGlobalBounds().contains(mouseWorldPos))
 			{
-				std::cout << "trigger " << trig_x << " " << trig_y << std::endl;
-				// création d'un sprite pour afficher une case d'exemple
-				sf::Sprite* sprite = new sf::Sprite;
-				sprite->setTexture(texture_rouge);
-				sf::Vector2u textureSize = texture_rouge.getSize();
-				sprite->setScale(static_cast<float>(TILE_SIZE) / textureSize.x, 
-								 static_cast<float>(TILE_SIZE) / textureSize.y);
-				sprite->setPosition(panneauCentral->getPosition()
-				                    + sf::Vector2f(trig_x * TILE_SIZE, trig_y * TILE_SIZE)); 
-				scene_particuliere.push_back(sprite);
+				std::cout << "trigger " << mouseX << " " << mouseY << std::endl;
+				int indicePiece = dataActuel[mouseY * nbCol + mouseX] - 2;
+				if (indicePiece >= 0)
+				{
+					pieces[indicePiece].trigger(mouseX, mouseY, dataActuel);
+				}
 			}
         }
         	
@@ -125,7 +117,6 @@ void AfficheurNiveau::demarrer()
 
 		// les affichages
 		dessiner();
-		for (sf::Drawable *x : scene_particuliere) fenetre.draw(*x);
 		
         fenetre.display();
     }
@@ -139,12 +130,10 @@ void AfficheurNiveau::initialiseNiveau()
     initialiseTrame();
 
 	// Recopier les positions des murs de `levelData` dans `dataActuel`
-	dataActuel = std::vector<int>{};
+	std::vector<int>{}.swap(dataActuel);
 	dataActuel.reserve(levelData.size());
-	std::vector<int>::const_iterator itLecture{levelData.begin()};
-	std::vector<int>::iterator itEcriture{dataActuel.begin()};
-	for (; itEcriture != dataActuel.end(); ++itLecture, ++itEcriture) {
-		*itEcriture = (*itLecture == 1) ? 1 : 0;
+	for (int data : levelData) {
+		dataActuel.emplace_back((data == 1) ? 1 : 0);
 	}
 
 	// Allouer la mémoire pour les sommets des pièces concrètes

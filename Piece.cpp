@@ -29,15 +29,21 @@ OperateurSymetrie& Piece::ajouteOpSymetrie(const pair<int, int> &position, Opera
     return *op;
 }
 
-// void Piece::trigger(const pair<float, float> &pos) {
-//     for (PieceOperateur *op : operateurs) {
-//         if(op->trigger(pos)) return;
-//     }
-// }
+void Piece::trigger(int mouseX, int mouseY, std::vector<int> &dataActuel) {
+    for (PieceOperateur *op : operateurs) {
+        if (mouseX == op->position.first && mouseY == op->position.second) {
+            std::cout << "GREAT" << std::endl;
+            accept(*op, dataActuel);
+        }
+    }
+}
 
-void Piece::accept(PieceOperateur &op) {
+void Piece::accept(PieceOperateur &op, std::vector<int> &dataActuel) {
+    int nbCol{8};
     for (pair<int,int> &coord : coordinates) {
+        dataActuel[coord.second * nbCol + coord.first] = 0;
         op.mapPosition(coord);
+        dataActuel[coord.second * nbCol + coord.first] = 2;
     }
     for (PieceOperateur *otherOp : operateurs) {
         op.mapOperateur(*otherOp);

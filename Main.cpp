@@ -24,17 +24,17 @@ int main()
 	};
 
 	Piece &p1 = niveaux[0].ajoutePiece({{1,1},{2,1},{2,2},{3,2}}, CouleurPiece::VERT);
-	// p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::SUD);
-	PieceOperateur &op1 = p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::SUD);
-	PieceOperateur &op2 = p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::EST);
-	PieceOperateur &op3 = p1.ajouteOpRotation({2,1}, OperateurRotation::ANTIHORAIRE);
-	p1.accept(op1);
-	p1.accept(*(p1.operateurs[0]));	
-	p1.accept(op2);
-	p1.accept(op2);
-	p1.accept(op2);
-	p1.accept(op3);
-	p1.accept(op2);
+	p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::SUD);
+	// PieceOperateur &op1 = p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::SUD);
+	// PieceOperateur &op2 = p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::EST);
+	// PieceOperateur &op3 = p1.ajouteOpRotation({2,1}, OperateurRotation::ANTIHORAIRE);
+	// p1.accept(op1);
+	// p1.accept(*(p1.operateurs[0]));	
+	// p1.accept(op2);
+	// p1.accept(op2);
+	// p1.accept(op2);
+	// p1.accept(op3);
+	// p1.accept(op2);
 
 	AfficheurNiveau afficheurNiveau{window, niveaux};
     afficheurNiveau.demarrer();

@@ -31,8 +31,8 @@ public:
 	OperateurDeplacement& ajouteOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens);
 	OperateurRotation& ajouteOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens);
 	OperateurSymetrie& ajouteOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens);
-	// void trigger(const pair<float, float> &pos);
-	void accept(PieceOperateur &op);
+	void trigger(int mouseX, int mouseY, std::vector<int> &dataActuel);
+	void accept(PieceOperateur &op, std::vector<int> &dataActuel);
 	// virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 };
 
