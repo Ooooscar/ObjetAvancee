@@ -99,8 +99,16 @@ void Niveau::redefinirData(const std::pair<int, int> &caseChoisie, int valeur) {
 	dataCasesActuelle[caseChoisie.second * nbCol + caseChoisie.first] = valeur;
 }
 
-void Niveau::triggerPiece(int indice, const std::pair<int, int> &caseChoisie) {
-	pieces[indice].trigger(caseChoisie);
+bool Niveau::triggerPiece(int indicePiece, const std::pair<int, int> &caseChoisie) {
+	return pieces[indicePiece].trigger(caseChoisie);
+}
+
+const bool Niveau::estGagne() const {
+	for (const Piece &piece : pieces) {
+		if (!piece.estAuBonEndroit())
+			return false;
+	}
+	return true;
 }
 
 void Niveau::draw(sf::RenderTarget &target, sf::RenderStates states) const {
@@ -187,11 +195,13 @@ void AfficheurNiveau::demarrer()
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left 
 				&& sourisSurNiveau)
 			{
-				std::cout << "trigger " << caseChoisie.first << " " << caseChoisie.second << std::endl;
+				// std::cout << "trigger " << caseChoisie.first << " " << caseChoisie.second << std::endl;
 				int indicePiece = niveauActuel.getDataActuelle(caseChoisie) - 2;
-				if (indicePiece >= 0)
+				if (indicePiece >= 0
+					&& niveauActuel.triggerPiece(indicePiece, caseChoisie)
+					&& niveauActuel.estGagne())
 				{
-					niveauActuel.triggerPiece(indicePiece, caseChoisie);
+					std::cout << "YOU WIN !!!" << std::endl;
 				}
 			}
         }

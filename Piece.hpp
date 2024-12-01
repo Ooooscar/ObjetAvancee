@@ -36,19 +36,21 @@ class Piece : private PieceData, public sf::Drawable
 {
 private:
 	Niveau &niveau;
-	const int indice;
+	const int indicePiece;
+	bool auBonEndroit;
 	std::vector<sf::Vertex> sommets;
 	friend class Niveau;
 public:
-	// Piece(int indice, const PieceData &dataPiece, int tailleCase);
-	Piece(Niveau &niveau, int indice, const PieceData &dataPiece);
+	// Piece(int indicePiece, const PieceData &dataPiece, int tailleCase);
+	Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece);
 	const int getIndice() const;
+	const bool estAuBonEndroit() const;
 	const std::vector<std::pair<int, int>>& getCoordonnees() const;
     const sf::Color& getCouleur() const;
     const sf::Color& getCouleurSecondaire() const;
 
-	void trigger(const std::pair<int, int> &caseChoisie);
-	void accepter(PieceOperateur &op);
+	bool trigger(const std::pair<int, int> &caseChoisie);
+	bool accepter(PieceOperateur &op);
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 };
 

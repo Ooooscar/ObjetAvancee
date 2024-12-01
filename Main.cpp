@@ -11,22 +11,24 @@ int main()
 
 	std::vector<NiveauData> niveaux{
 		{
-			8, 6,
+			7, 9,
 			{
-				1,1,1,1,1,1,1,1,
-				1,0,0,1,1,1,2,1,
-				1,0,0,0,1,2,2,1,
-				1,0,0,0,0,2,0,1,
-				1,1,0,0,0,0,0,1,
-				1,1,1,1,1,1,1,1,
+				1,1,1,1,1,1,1,
+				1,1,0,0,0,1,1,
+				1,2,2,2,0,0,1,
+				1,1,2,1,0,0,1,
+				1,1,1,1,0,0,1,
+				1,1,0,1,0,0,1,
+				1,0,0,0,0,0,1,
+				1,1,0,0,0,1,1,
+				1,1,1,1,1,1,1,
 			}
 		}
 	};
-
-	PieceData &p1 = niveaux[0].ajouterPiece({{1,1},{2,1},{2,2},{3,2}}, CouleurPiece::VERT);
-	p1.ajouterOpDeplacement({1,1}, OperateurDeplacement::SUD);
-	p1.ajouterOpDeplacement({3,2}, OperateurDeplacement::EST);
-	p1.ajouterOpRotation({2,1}, OperateurRotation::ANTIHORAIRE);
+	PieceData &p1 = niveaux[0].ajouterPiece({{1,6},{2,5},{2,6},{3,6}}, CouleurPiece::VERT);
+	p1.ajouterOpDeplacement({1,6}, OperateurDeplacement::OUEST);
+	p1.ajouterOpDeplacement({3,6}, OperateurDeplacement::EST);
+	p1.ajouterOpRotation({2,6}, OperateurRotation::ANTIHORAIRE);
 
 	AfficheurNiveau afficheurNiveau{window, niveaux};
     afficheurNiveau.demarrer();

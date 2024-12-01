@@ -42,8 +42,9 @@ public:
     Niveau(const NiveauData &dataNiveau);
     const int getDataActuelle(const std::pair<int, int> &caseChoisie) const;
     const int getDataAttendue(const std::pair<int, int> &caseChoisie) const;
-    void triggerPiece(int indice, const std::pair<int, int> &caseChoisie);
     void redefinirData(const std::pair<int, int> &caseChoisie, int valeur);
+    bool triggerPiece(int indicePiece, const std::pair<int, int> &caseChoisie);
+    const bool estGagne() const;
     
     const bool contient(const sf::Vector2f& posSouris) const;
     std::pair<int, int> mapPixelsEnCases(const sf::Vector2f& posSouris) const;

@@ -29,37 +29,50 @@ OperateurSymetrie& PieceData::ajouterOpSymetrie(const std::pair<int, int> &posit
 //////////////////////////////
 //////// CLASSE Piece ////////
 
-Piece::Piece(Niveau &niveau, int indice, const PieceData &dataPiece)
-    : PieceData{dataPiece}, niveau{niveau}, indice{indice}, sommets{}
+Piece::Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece)
+    : PieceData{dataPiece}, niveau{niveau}, indicePiece{indicePiece}, auBonEndroit{false}, sommets{}
 {}
 
-const int Piece::getIndice() const { return indice; }
+const int Piece::getIndice() const { return indicePiece; }
+const bool Piece::estAuBonEndroit() const { return auBonEndroit; }
 const std::vector<std::pair<int, int>>& Piece::getCoordonnees() const { return coordonnees; }
 const sf::Color& Piece::getCouleur() const { return couleur.first; }
 const sf::Color& Piece::getCouleurSecondaire() const { return couleur.second; }
 
-void Piece::trigger(const std::pair<int, int> &caseChoisie) {
+bool Piece::trigger(const std::pair<int, int> &caseChoisie) {
     for (PieceOperateur *op : operateurs) {
         if (caseChoisie == op->position) {
-            accepter(*op);
+            if (accepter(*op)) return true;
         }
     }
-    
+    return false;
 }
 
-void Piece::accepter(PieceOperateur &op) {
+bool Piece::accepter(PieceOperateur &op) {
+    for (std::pair<int, int> caseOccupee_copie : coordonnees) {
+        op.mapPosition(caseOccupee_copie);
+        int dataCible = niveau.getDataActuelle(caseOccupee_copie);
+        if (dataCible && dataCible != indicePiece + 2) {
+            // donc cette nouvelle case à visiter est occupé
+            return false;
+        }
+    }
+    // Ici alors l'operation à accepter est valide
+    auBonEndroit = true;
     sommets.clear();
     for (const std::pair<int, int> &caseOccupee : coordonnees) {
         niveau.redefinirData(caseOccupee, 0);
     }
 	for (std::pair<int, int> &caseOccupee : coordonnees) {
         op.mapPosition(caseOccupee);
-		niveau.redefinirData(caseOccupee, indice + 2);
+        auBonEndroit &= (niveau.getDataAttendue(caseOccupee) == indicePiece + 2);
+		niveau.redefinirData(caseOccupee, indicePiece + 2);
 		niveau.ajouterSommetsCellule(sommets, caseOccupee.first, caseOccupee.second, getCouleur());
 	}
     for (PieceOperateur *otherOp : operateurs) {
         op.mapOperateur(*otherOp);
     }
+    return true;
 }
 
 void Piece::draw(sf::RenderTarget &target, sf::RenderStates states) const {
