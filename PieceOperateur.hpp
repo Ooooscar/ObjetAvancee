@@ -1,7 +1,6 @@
 #ifndef _PIECEOUT_PIECE_OPERATEUR
 #define _PIECEOUT_PIECE_OPERATEUR
 #include <utility> // pour pair
-using std::pair;
 
 class OperateurDeplacement;
 class OperateurRotation;
@@ -10,10 +9,10 @@ class OperateurSymetrie;
 class PieceOperateur
 {
 public:
-	pair<int, int> position;
+	std::pair<int, int> position;
 public:
-	PieceOperateur(const pair<int,int> &position);
-	virtual void mapPosition(pair<int, int> &pos) const = 0;
+	PieceOperateur(const std::pair<int,int> &position);
+	virtual void mapPosition(std::pair<int, int> &pos) const = 0;
 	virtual void mapOperateur(PieceOperateur &op) const = 0;
 
 	virtual void accepter(const OperateurDeplacement &op);
@@ -33,8 +32,8 @@ public:
 private:
 	Orientation sens;
 public:
-	OperateurDeplacement(const pair<int,int> &position, Orientation sens);
-	virtual void mapPosition(pair<int, int> &pos) const;
+	OperateurDeplacement(const std::pair<int,int> &position, Orientation sens);
+	virtual void mapPosition(std::pair<int, int> &pos) const;
 	virtual void mapOperateur(PieceOperateur &op) const;
 
 	virtual void accepter(const OperateurRotation &op);
@@ -48,8 +47,8 @@ public:
 public:
 	Orientation sens;
 public:
-	OperateurRotation(const pair<int,int> &position, Orientation sens);
-	virtual void mapPosition(pair<int, int> &pos) const;
+	OperateurRotation(const std::pair<int,int> &position, Orientation sens);
+	virtual void mapPosition(std::pair<int, int> &pos) const;
 	virtual void mapOperateur(PieceOperateur &op) const;
 
 	virtual void accepter(const OperateurSymetrie &op);
@@ -61,8 +60,8 @@ public:
 	enum Orientation {VERTICALE, HORIZONTALE};
 	Orientation sens;
 public:
-	OperateurSymetrie(const pair<int,int> &position, Orientation sens);
-	virtual void mapPosition(pair<int, int> &pos) const;
+	OperateurSymetrie(const std::pair<int,int> &position, Orientation sens);
+	virtual void mapPosition(std::pair<int, int> &pos) const;
 	virtual void mapOperateur(PieceOperateur &op) const;
 
 	virtual void accepter(const OperateurRotation &op);

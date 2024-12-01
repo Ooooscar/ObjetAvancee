@@ -1,9 +1,9 @@
 #ifndef _PIECEOUT_LEVEL
 #define _PIECEOUT_LEVEL
+#include "Piece.hpp"
+#include <SFML/Graphics.hpp>
 #include <utility>
 #include <iostream>
-#include <SFML/Graphics.hpp>
-#include "Piece.hpp"
 
 class NiveauData
 {
@@ -15,7 +15,7 @@ protected:
 public:
     NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &casesAttendue);
     NiveauData(const int nbCol, const int nbLigne, std::vector<int> &&casesAttendue);
-    PieceData& ajouterPiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
+    PieceData& ajouterPiece(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur);
 };
 
 class Niveau : private NiveauData, public sf::Drawable
@@ -35,6 +35,8 @@ private:
     sf::RectangleShape panneauCentral;
     std::vector<sf::Vector2f> treillis;
     std::vector<sf::Vertex> sommetsTrame;
+
+    friend class Piece;
 
 public:
     Niveau(const NiveauData &dataNiveau);

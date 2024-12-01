@@ -1,9 +1,9 @@
 #ifndef _PIECEOUT_EBAUCHE_MODEL
 #define _PIECEOUT_EBAUCHE_MODEL
-#include <utility> // pour pair
-#include <vector>
-#include <SFML/Graphics.hpp>
 #include "PieceOperateur.hpp"
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <utility> // pour pair
 
 class CouleurPiece : public std::pair<sf::Color, sf::Color>
 {
@@ -20,14 +20,14 @@ public:
 class PieceData
 {
 protected:
-	std::vector<pair<int, int>> coordonnees;
+	std::vector<std::pair<int, int>> coordonnees;
 	std::vector<PieceOperateur*> operateurs;
 	CouleurPiece couleur;
 public:
-	PieceData(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
-	OperateurDeplacement& ajouterOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens);
-	OperateurRotation& ajouterOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens);
-	OperateurSymetrie& ajouterOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens);
+	PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur);
+	OperateurDeplacement& ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens);
+	OperateurRotation& ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens);
+	OperateurSymetrie& ajouterOpSymetrie(const std::pair<int, int> &position, OperateurSymetrie::Orientation sens);
 };
 
 class Niveau;
@@ -43,7 +43,7 @@ public:
 	// Piece(int indice, const PieceData &dataPiece, int tailleCase);
 	Piece(Niveau &niveau, int indice, const PieceData &dataPiece);
 	const int getIndice() const;
-	const std::vector<pair<int, int>>& getCoordonnees() const;
+	const std::vector<std::pair<int, int>>& getCoordonnees() const;
     const sf::Color& getCouleur() const;
     const sf::Color& getCouleurSecondaire() const;
 

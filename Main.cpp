@@ -1,6 +1,6 @@
+#include "Niveau.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "Niveau.hpp"
 
 int main()
 {

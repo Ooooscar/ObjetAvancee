@@ -11,7 +11,7 @@ NiveauData::NiveauData(const int nbCol, const int nbLigne, std::vector<int> &&da
 	: nbCol{nbCol}, nbLigne{nbLigne}, dataCasesAttendue{dataCasesAttendue}, dataPieces{}
 {}
 
-PieceData& NiveauData::ajouterPiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur) {
+PieceData& NiveauData::ajouterPiece(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur) {
 	dataPieces.emplace_back(PieceData{coords, couleur});
 	return dataPieces.back();
 }

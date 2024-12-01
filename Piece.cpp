@@ -1,25 +1,26 @@
 #include "Piece.hpp"
+#include "Niveau.hpp"
 #include <cmath>
 #include <iostream>
 
 //////////////////////////////////
 //////// CLASSE PieceData ////////
 
-PieceData::PieceData(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur)
+PieceData::PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur)
     : coordonnees{coords}, operateurs{}, couleur{couleur}
 {}
 
-OperateurDeplacement& PieceData::ajouterOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens) {
+OperateurDeplacement& PieceData::ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens) {
     OperateurDeplacement* op = new OperateurDeplacement{position, sens};
     operateurs.emplace_back(op);
     return *op;
 }
-OperateurRotation& PieceData::ajouterOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens) {
+OperateurRotation& PieceData::ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens) {
     OperateurRotation* op = new OperateurRotation{position, sens};
     operateurs.push_back(op);
     return *op;
 }
-OperateurSymetrie& PieceData::ajouterOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens) {
+OperateurSymetrie& PieceData::ajouterOpSymetrie(const std::pair<int, int> &position, OperateurSymetrie::Orientation sens) {
     OperateurSymetrie* op = new OperateurSymetrie{position, sens};
     operateurs.push_back(op);
     return *op;
@@ -33,7 +34,7 @@ Piece::Piece(Niveau &niveau, int indice, const PieceData &dataPiece)
 {}
 
 const int Piece::getIndice() const { return indice; }
-const std::vector<pair<int, int>>& Piece::getCoordonnees() const { return coordonnees; }
+const std::vector<std::pair<int, int>>& Piece::getCoordonnees() const { return coordonnees; }
 const sf::Color& Piece::getCouleur() const { return couleur.first; }
 const sf::Color& Piece::getCouleurSecondaire() const { return couleur.second; }
 
@@ -46,13 +47,12 @@ void Piece::trigger(const std::pair<int, int> &caseChoisie, std::vector<int> &da
 }
 
 void Piece::accepter(PieceOperateur &op, std::vector<int> &dataCasesActuelles) {
-    int nbCol{8}; // TODO
-    for (pair<int,int> &coord : coordonnees) {
-        dataCasesActuelles[coord.second * nbCol + coord.first] = 0;
+    for (std::pair<int,int> &coord : coordonnees) {
+        dataCasesActuelles[coord.second * niveau.nbCol + coord.first] = 0;
     }
-    for (pair<int,int> &coord : coordonnees) {
+    for (std::pair<int,int> &coord : coordonnees) {
         op.mapPosition(coord);
-        dataCasesActuelles[coord.second * nbCol + coord.first] = indice + 2;
+        dataCasesActuelles[coord.second * niveau.nbCol + coord.first] = indice + 2;
     }
     for (PieceOperateur *otherOp : operateurs) {
         op.mapOperateur(*otherOp);
