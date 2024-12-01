@@ -27,16 +27,6 @@ int main()
 	p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::SUD);
 	p1.ajouteOpDeplacement({3,2}, OperateurDeplacement::EST);
 	p1.ajouteOpRotation({2,1}, OperateurRotation::ANTIHORAIRE);
-	// PieceOperateur &op1 = p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::SUD);
-	// PieceOperateur &op2 = p1.ajouteOpDeplacement({1,1}, OperateurDeplacement::EST);
-	// PieceOperateur &op3 = p1.ajouteOpRotation({2,1}, OperateurRotation::ANTIHORAIRE);
-	// p1.accept(op1);
-	// p1.accept(*(p1.operateurs[0]));	
-	// p1.accept(op2);
-	// p1.accept(op2);
-	// p1.accept(op2);
-	// p1.accept(op3);
-	// p1.accept(op2);
 
 	AfficheurNiveau afficheurNiveau{window, niveaux};
     afficheurNiveau.demarrer();
