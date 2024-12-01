@@ -4,33 +4,26 @@
 
 int main()
 {
-	// Parametres graphiques, à replacer au bon endroit
-	unsigned int nbPix_x = 1000, nbPix_y = 1000; // TODO
-	sf::RenderWindow window{sf::VideoMode{nbPix_x, nbPix_y}, "Piece Out"};
-	window.setFramerateLimit(30);
-
 	std::vector<NiveauData> niveaux{
 		{
-			7, 9,
+			9, 7,
 			{
-				1,1,1,1,1,1,1,
-				1,1,0,0,0,1,1,
-				1,2,2,2,0,0,1,
-				1,1,2,1,0,0,1,
-				1,1,1,1,0,0,1,
-				1,1,0,1,0,0,1,
-				1,0,0,0,0,0,1,
-				1,1,0,0,0,1,1,
-				1,1,1,1,1,1,1,
+				1,1,1,1,1,1,1,1,1,
+				1,1,0,1,1,1,2,1,1,
+				1,0,0,0,1,2,2,0,1,
+				1,0,0,1,1,1,2,0,1,
+				1,0,0,0,0,0,0,0,1,
+				1,1,0,0,0,0,0,1,1,
+				1,1,1,1,1,1,1,1,1,
 			}
 		}
 	};
-	PieceData &p1 = niveaux[0].ajouterPiece({{1,6},{2,5},{2,6},{3,6}}, CouleurPiece::VERT);
-	p1.ajouterOpDeplacement({1,6}, OperateurDeplacement::OUEST);
-	p1.ajouterOpDeplacement({3,6}, OperateurDeplacement::EST);
-	p1.ajouterOpRotation({2,6}, OperateurRotation::ANTIHORAIRE);
+	PieceData &p1 = niveaux[0].ajouterPiece({{2,1},{2,2},{2,3},{3,2}}, CouleurPiece::VERT);
+	p1.ajouterOpDeplacement({2,1}, OperateurDeplacement::NORD);
+	p1.ajouterOpDeplacement({2,3}, OperateurDeplacement::SUD);
+	p1.ajouterOpRotation({2,2}, OperateurRotation::ANTIHORAIRE);
 
-	AfficheurNiveau afficheurNiveau{window, niveaux};
+	AfficheurNiveau afficheurNiveau{niveaux};
     afficheurNiveau.demarrer();
 
     return EXIT_SUCCESS;

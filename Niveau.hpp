@@ -21,33 +21,31 @@ public:
 class Niveau : private NiveauData, public sf::Drawable
 {
 public:
-    static const int MARGIN_LEFT = 100, MARGIN_RIGHT = 100, MARGIN_TOP = 100, MARGIN_BOTTOM = 100;
-    static const int TILE_SIZE = 96;
 
 private:
     static const sf::Color COULEUR_DU_MUR;
     static const sf::Color COULEUR_DU_SOL;
 
-    std::vector<Piece> pieces;
-    std::vector<int> dataCasesActuelle;
-    int nbCasesOccupees;
-
+    float tailleCase;
     sf::RectangleShape panneauCentral;
     std::vector<sf::Vector2f> treillis;
     std::vector<sf::Vertex> sommetsTrame;
 
+    std::vector<Piece> pieces;
+    std::vector<int> dataCasesActuelle;
+
     friend class Piece;
 
 public:
-    Niveau(const NiveauData &dataNiveau);
+    Niveau(const NiveauData &dataNiveau, const sf::Vector2f& coordCentre, float tailleCase);
     const int getDataActuelle(const std::pair<int, int> &caseChoisie) const;
     const int getDataAttendue(const std::pair<int, int> &caseChoisie) const;
     void redefinirData(const std::pair<int, int> &caseChoisie, int valeur);
     bool triggerPiece(int indicePiece, const std::pair<int, int> &caseChoisie);
     const bool estGagne() const;
     
-    const bool contient(const sf::Vector2f& posSouris) const;
-    std::pair<int, int> mapPixelsEnCases(const sf::Vector2f& posSouris) const;
+    const bool contient(const sf::Vector2f &posSouris) const;
+    std::pair<int, int> mapPixelsEnCases(const sf::Vector2f &posSouris) const;
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 private:
     void genererTreillis();
@@ -57,18 +55,19 @@ private:
 class AfficheurNiveau
 {
 private:
-    static const int MARGIN_LEFT = 100, MARGIN_RIGHT = 100, MARGIN_TOP = 100, MARGIN_BOTTOM = 100;
-	static const int TILE_SIZE = 96;
     static const sf::Color COULEUR_DU_MUR;
     static const sf::Color COULEUR_DU_SOL;
 
-    sf::RenderWindow& fenetre;
     const std::vector<NiveauData> niveaux;
+    sf::RenderWindow fenetre;
+    sf::Vector2f coordOrigine;
+    float tailleCase;
+
     int indiceNiveauActuel;
     Niveau niveauActuel;
 
 public:
-    AfficheurNiveau(sf::RenderWindow& fenetre, const std::vector<NiveauData>& niveaux);
+    AfficheurNiveau(const std::vector<NiveauData> &niveaux);
     void prochainNiveau();
     void allerAuNiveau(int indice);
     void demarrer();

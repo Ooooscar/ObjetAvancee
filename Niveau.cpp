@@ -4,11 +4,17 @@
 ///////////////////////////////////
 //////// CLASSE NiveauData ////////
 
-NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &dataCasesAttendue)
-	: nbCol{nbCol}, nbLigne{nbLigne}, dataCasesAttendue{dataCasesAttendue}, dataPieces{}
+NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &dataCasesAttendue) :
+	nbCol{nbCol},
+	nbLigne{nbLigne},
+	dataCasesAttendue{dataCasesAttendue},
+	dataPieces{}
 {}
-NiveauData::NiveauData(const int nbCol, const int nbLigne, std::vector<int> &&dataCasesAttendue)
-	: nbCol{nbCol}, nbLigne{nbLigne}, dataCasesAttendue{dataCasesAttendue}, dataPieces{}
+NiveauData::NiveauData(const int nbCol, const int nbLigne, std::vector<int> &&dataCasesAttendue) :
+	nbCol{nbCol},
+	nbLigne{nbLigne},
+	dataCasesAttendue{dataCasesAttendue},
+	dataPieces{}
 {}
 
 PieceData& NiveauData::ajouterPiece(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur) {
@@ -26,18 +32,25 @@ const sf::Color Niveau::COULEUR_DU_SOL = sf::Color{0xFFFFFCFF};
 
 //////// CONSTRUCTEURS ////////
 
-Niveau::Niveau(const NiveauData &dataNiveau)
-	: NiveauData{dataNiveau}, pieces{}, dataCasesActuelle{}, nbCasesOccupees{0},
-		panneauCentral{sf::RectangleShape(sf::Vector2f(nbCol * TILE_SIZE, nbLigne * TILE_SIZE))},
-		treillis{}, sommetsTrame{}
+Niveau::Niveau(const NiveauData &dataNiveau, const sf::Vector2f& coordCentre, float tailleCase) :
+	NiveauData{dataNiveau},
+	tailleCase{tailleCase},
+	panneauCentral{sf::RectangleShape(sf::Vector2f(nbCol * tailleCase, nbLigne * tailleCase))},
+	treillis{},
+	sommetsTrame{},
+	pieces{},
+	dataCasesActuelle{}
 {
-	panneauCentral.setPosition(MARGIN_LEFT, MARGIN_TOP);
+	panneauCentral.setPosition(coordCentre - panneauCentral.getSize() / 2.0f);
 	panneauCentral.setFillColor(COULEUR_DU_SOL);
-	genererTreillis();
 
-	pieces.reserve(dataPieces.size());
-	for (const PieceData &dataPiece : dataPieces) {
-		pieces.emplace_back(Piece(*this, static_cast<int>(pieces.size()), dataPiece));
+	treillis.reserve((nbCol + 1) * (nbLigne + 1));
+	float margeEnHaut = panneauCentral.getPosition().y;
+	float margeEnGauche = panneauCentral.getPosition().x;
+	for (float y = margeEnHaut; y <= margeEnHaut + nbLigne * tailleCase; y += tailleCase) {
+		for (float x = margeEnGauche; x <= margeEnGauche + nbCol * tailleCase; x += tailleCase) {
+			treillis.emplace_back(sf::Vector2f{static_cast<float>(x), static_cast<float>(y)});
+		}
 	}
 
 	sommetsTrame.reserve(nbCol * nbLigne * 6);
@@ -61,12 +74,16 @@ Niveau::Niveau(const NiveauData &dataNiveau)
 		}
 	}
 
+	pieces.reserve(dataPieces.size());
+	for (const PieceData &dataPiece : dataPieces) {
+		pieces.emplace_back(Piece(*this, static_cast<int>(pieces.size()), dataPiece));
+	}
+
 	dataCasesActuelle.reserve(dataCasesAttendue.size());
 	// Recopier les positions des murs de `dataCasesAttendue` dans `dataCasesActuelle`
 	for (int dataCase : dataCasesAttendue) {
 		dataCasesActuelle.emplace_back((dataCase == 1) ? 1 : 0);
 	}
-
 	// Écriver les positions des `Piece` dans `dataCasesActuelle`
 	for (Piece &piece : pieces) {
 		piece.sommets.reserve(piece.getCoordonnees().size() * 6);
@@ -91,8 +108,8 @@ const bool Niveau::contient(const sf::Vector2f& posSouris) const {
 }
 std::pair<int, int> Niveau::mapPixelsEnCases(const sf::Vector2f& posSouris) const {
 	sf::Vector2f topLeft = panneauCentral.getPosition();
-	return std::make_pair<int>( static_cast<int>((posSouris.x - topLeft.x) / TILE_SIZE),
-		                        static_cast<int>((posSouris.y - topLeft.y) / TILE_SIZE) );
+	return std::make_pair<int>( static_cast<int>((posSouris.x - topLeft.x) / tailleCase),
+		                        static_cast<int>((posSouris.y - topLeft.y) / tailleCase) );
 }
 
 void Niveau::redefinirData(const std::pair<int, int> &caseChoisie, int valeur) {
@@ -122,16 +139,6 @@ void Niveau::draw(sf::RenderTarget &target, sf::RenderStates states) const {
 
 //////// METHODES PRIVEES ////////
 
-void Niveau::genererTreillis() {
-	std::vector<sf::Vector2f>{}.swap(treillis);
-	treillis.reserve((nbCol + 1) * (nbLigne + 1));
-	for (int y = MARGIN_TOP; y <= MARGIN_TOP + nbLigne * TILE_SIZE; y += TILE_SIZE) {
-		for (int x = MARGIN_LEFT; x <= MARGIN_LEFT + nbCol * TILE_SIZE; x += TILE_SIZE) {
-			treillis.emplace_back(sf::Vector2f{static_cast<float>(x), static_cast<float>(y)});
-		}
-	}
-}
-
 void Niveau::ajouterSommetsCellule(std::vector<sf::Vertex>& trame, int x, int y, const sf::Color& couleur) {
 	int indiceCellulePlusY{y*(nbCol+1) + x};
 	trame.emplace_back(sf::Vertex(treillis[indiceCellulePlusY], couleur));
@@ -147,12 +154,19 @@ void Niveau::ajouterSommetsCellule(std::vector<sf::Vertex>& trame, int x, int y,
 
 //////// CONSTRUCTEURS ////////
 
-AfficheurNiveau::AfficheurNiveau(sf::RenderWindow &fenetre, const std::vector<NiveauData> &niveaux)
+AfficheurNiveau::AfficheurNiveau(const std::vector<NiveauData> &niveaux) :
 	// ici les deep-copies sont faites pour les `std::vector`
 	// TODO : éviter la copie de `std::vector<NiveauData>& niveaux` ici...
-	: fenetre{fenetre}, niveaux{niveaux},
-		indiceNiveauActuel{0}, niveauActuel{niveaux[0]}
-{}
+	niveaux{niveaux},
+	fenetre{ { static_cast<unsigned int>(sf::VideoMode::getDesktopMode().width / 3) * 2,
+			   static_cast<unsigned int>(sf::VideoMode::getDesktopMode().height / 3) * 2 },
+			 "Piece Out" },
+	coordOrigine{fenetre.mapPixelToCoords(sf::Vector2i{fenetre.getSize()}) / 2.0f},
+	tailleCase{std::min(coordOrigine.x, coordOrigine.y) / 6.0f},
+	indiceNiveauActuel{0}, niveauActuel{niveaux[0], coordOrigine, tailleCase}
+{
+	fenetre.setFramerateLimit(30);
+}
 
 //////// METHODES PUBLICS ////////
 
@@ -161,7 +175,7 @@ void AfficheurNiveau::prochainNiveau() {
 }
 void AfficheurNiveau::allerAuNiveau(int indice) {
     indiceNiveauActuel = indice;
-	niveauActuel = Niveau(niveaux[indiceNiveauActuel]);
+	niveauActuel = Niveau(niveaux[indiceNiveauActuel], coordOrigine, tailleCase);
 }
 
 void AfficheurNiveau::demarrer()
