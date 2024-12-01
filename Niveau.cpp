@@ -4,9 +4,14 @@
 ///////////////////////////////
 //////// CLASSE Niveau ////////
 
-Niveau::Niveau(const int nbCol, const int nbLigne, const std::vector<int> &levelData, const std::vector<Piece*>& pieces)
-	: nbCol{nbCol}, nbLigne{nbLigne}, levelData{std::move(levelData)}, pieces{std::move(pieces)}
+Niveau::Niveau(const int nbCol, const int nbLigne, const std::vector<int> &&levelData)
+	: nbCol{nbCol}, nbLigne{nbLigne}, levelData{levelData}, pieces{}
 {}
+
+Piece& Niveau::ajoutePiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur) {
+	pieces.emplace_back(Piece{coords, couleur});
+	return pieces.back();
+}
 
 ////////////////////////////////////////
 //////// CLASSE AfficheurNiveau ////////
@@ -18,10 +23,14 @@ const sf::Color AfficheurNiveau::COULEUR_DU_SOL = sf::Color{0xFFFFFCFF};
 
 //////// CONSTRUCTEURS ////////
 
-AfficheurNiveau::AfficheurNiveau(sf::RenderWindow& fenetre, const std::vector<Niveau>& niveaux)
-	: fenetre{fenetre}, niveaux{std::move(niveaux)}
+AfficheurNiveau::AfficheurNiveau(sf::RenderWindow &fenetre, const std::vector<Niveau> &niveaux)
+	// ici les deep-copies sont faites pour les `std::vector`
+	// TODO : éviter la copie de `std::vector<Niveau>& niveaux` ici...
+	: fenetre{fenetre}, niveaux{niveaux}, indiceNiveauActuel{0},
+	  	nbCol{niveaux[indiceNiveauActuel].nbCol}, nbLigne{niveaux[indiceNiveauActuel].nbLigne},
+	  	levelData{niveaux[indiceNiveauActuel].levelData}, pieces{niveaux[indiceNiveauActuel].pieces}
 {
-	allerAuNiveau(0);
+	initialiseNiveau();
 }
 
 //////// METHODES PUBLICS ////////
@@ -34,36 +43,12 @@ void AfficheurNiveau::prochainNiveau()
 void AfficheurNiveau::allerAuNiveau(int indice)
 {
     indiceNiveauActuel = indice;
-	niveauActuel = &(niveaux[indiceNiveauActuel]);
-    nbCol = niveauActuel->nbCol;
-    nbLigne = niveauActuel->nbLigne;
-
-	// Initialise les sommets de la scène générale (les murs et le sol)
-    initialiseTrame();
-
-	// On veut recopier les données du niveau choisi ici
-	dataActuel = std::vector<int>(niveauActuel->levelData.size());
-	std::vector<int>::const_iterator itLecture{niveauActuel->levelData.begin()};
-	std::vector<int>::iterator itEcriture{dataActuel.begin()};
-	for (; itEcriture != dataActuel.end(); ++itLecture, ++itEcriture) {
-		*itEcriture = (*itLecture == 1) ? 1 : 0;
-	}
-	dataActuel = niveauActuel->levelData; // ici une copie est faite
-	for (size_t i = 0; i < dataActuel.size(); ++i) {
-		dataActuel[i] = (niveauActuel->levelData[i] == 1) ? 1 : 0;
-	}
-
-	// Allouer la mémoire pour les sommets des pièces concrètes
-	// et générer les données actuelles du niveau
-	int numeroPiece = 2;
-	size_t nbCasesOccupes = 0;
-	for (Piece *p : niveauActuel->pieces) {
-		nbCasesOccupes += p->coordinates.size();
-		for (std::pair<int, int> &coord : p->coordinates) {
-			dataActuel[coord.second*nbCol + coord.first] = numeroPiece;
-		}
-	}
-	sommetsSceneParticuliere = std::vector<sf::Vertex>(nbCasesOccupes * 6);
+	nbCol = niveaux[indiceNiveauActuel].nbCol;
+	nbLigne = niveaux[indiceNiveauActuel].nbLigne;
+	// ici les deep-copies sont faites pour les `std::vector`
+	levelData = niveaux[indiceNiveauActuel].levelData;
+	pieces = niveaux[indiceNiveauActuel].pieces;
+	initialiseNiveau();
 }
 
 void AfficheurNiveau::dessiner()
@@ -73,9 +58,9 @@ void AfficheurNiveau::dessiner()
     fenetre.draw(&sommetsTrame[0], sommetsTrame.size(), sf::Triangles);
 
 	// Scène particulière (les pièces concrètes)
-	for (Piece *p : niveaux[indiceNiveauActuel].pieces) {
-		for (std::pair<int,int> coord : p->coordinates) {
-			ajouterSommetsCellule(sommetsSceneParticuliere, coord.first, coord.second, p->couleur.first);
+	for (Piece p : pieces) {
+		for (std::pair<int,int> coord : p.coordinates) {
+			ajouterSommetsCellule(sommetsSceneParticuliere, coord.first, coord.second, p.couleur.first);
 		}
 	}
     fenetre.draw(&sommetsSceneParticuliere[0], sommetsSceneParticuliere.size(), sf::Triangles);
@@ -148,6 +133,33 @@ void AfficheurNiveau::demarrer()
 
 //////// METHODES PRIVEES ////////
 
+void AfficheurNiveau::initialiseNiveau()
+{
+	// Initialiser les sommets de la scène générale (les murs et le sol)
+    initialiseTrame();
+
+	// Recopier les positions des murs de `levelData` dans `dataActuel`
+	dataActuel = std::vector<int>{};
+	dataActuel.reserve(levelData.size());
+	std::vector<int>::const_iterator itLecture{levelData.begin()};
+	std::vector<int>::iterator itEcriture{dataActuel.begin()};
+	for (; itEcriture != dataActuel.end(); ++itLecture, ++itEcriture) {
+		*itEcriture = (*itLecture == 1) ? 1 : 0;
+	}
+
+	// Allouer la mémoire pour les sommets des pièces concrètes
+	// et générer les données actuelles du niveau
+	int numeroPiece = 2;
+	size_t nbCasesOccupes = 0;
+	for (Piece &p : pieces) {
+		nbCasesOccupes += p.coordinates.size();
+		for (std::pair<int, int> &coord : p.coordinates) {
+			dataActuel[coord.second*nbCol + coord.first] = numeroPiece;
+		}
+	}
+	sommetsSceneParticuliere = std::vector<sf::Vertex>(nbCasesOccupes * 6);
+}
+
 void AfficheurNiveau::initialiseTrame()
 {
 	// Le sol
@@ -163,14 +175,16 @@ void AfficheurNiveau::initialiseTrame()
 	int indiceCellule = 0;
 	for (int y = 0; y < nbLigne; ++y) {
 		for (int x = 0; x < nbCol; ++x) {
-			switch (niveauActuel->levelData[indiceCellule]) {
+			switch (levelData[indiceCellule]) {
 				case 0 :
 					break;
 				case 1 :
 					ajouterSommetsCellule(sommetsTrame, x, y, COULEUR_DU_MUR);
 					break;
 				default	:
-					ajouterSommetsCellule(sommetsTrame, x, y, niveauActuel->pieces[0]->couleur.second);
+					unsigned int indicePiece = levelData[indiceCellule] - 2;
+					if (indicePiece < pieces.size())
+						ajouterSommetsCellule(sommetsTrame, x, y, pieces[indicePiece].couleur.second);
 					break;
 			}
 			++indiceCellule;

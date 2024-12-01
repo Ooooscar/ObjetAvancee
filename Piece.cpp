@@ -1,11 +1,12 @@
 #include "Piece.hpp"
 #include <cmath>
+#include <iostream>
 
 //////////////////////////////
 //////// CLASSE Piece ////////
 
-Piece::Piece(const std::vector<pair<int, int>> &coords, const std::vector<PieceOperateur*> &operateurs, const CouleurPiece &couleur)
-    : coordinates{std::move(coords)}, operateurs{std::move(operateurs)}, couleur{couleur}
+Piece::Piece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur)
+    : coordinates{coords}, operateurs{}, couleur{couleur}
 {}
 
 const std::vector<pair<int, int>>& Piece::getCoordinates() const {
@@ -13,17 +14,17 @@ const std::vector<pair<int, int>>& Piece::getCoordinates() const {
 }
 
 OperateurDeplacement& Piece::ajouteOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens) {
-    OperateurDeplacement* op = new OperateurDeplacement{std::move(position), sens};
-    operateurs.push_back(op);
+    OperateurDeplacement* op = new OperateurDeplacement{position, sens};
+    operateurs.emplace_back(op);
     return *op;
 }
 OperateurRotation& Piece::ajouteOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens) {
-    OperateurRotation* op = new OperateurRotation{std::move(position), sens};
+    OperateurRotation* op = new OperateurRotation{position, sens};
     operateurs.push_back(op);
     return *op;
 }
 OperateurSymetrie& Piece::ajouteOpSymetrie(const pair<int, int> &position, OperateurSymetrie::Orientation sens) {
-    OperateurSymetrie* op = new OperateurSymetrie{std::move(position), sens};
+    OperateurSymetrie* op = new OperateurSymetrie{position, sens};
     operateurs.push_back(op);
     return *op;
 }
@@ -47,7 +48,7 @@ void Piece::accept(PieceOperateur &op) {
 //////// CLASSE CouleurPiece ////////
 
 CouleurPiece::CouleurPiece(const sf::Color &piece, const sf::Color &cible)
-	: std::pair<const sf::Color, const sf::Color>{piece, cible}
+	: std::pair<sf::Color, sf::Color>{piece, cible}
 {}
 
 const CouleurPiece CouleurPiece::ROUGE {sf::Color{0xFD4030FF}, sf::Color{0xFEB0A9FF}};
