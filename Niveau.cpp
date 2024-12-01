@@ -9,7 +9,7 @@ Niveau::Niveau(const int nbCol, const int nbLigne, const std::vector<int> &&leve
 {}
 
 Piece& Niveau::ajoutePiece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur) {
-	pieces.emplace_back(Piece{coords, couleur});
+	pieces.emplace_back(Piece{static_cast<int>(pieces.size()), coords, couleur});
 	return pieces.back();
 }
 

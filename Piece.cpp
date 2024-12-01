@@ -5,8 +5,8 @@
 //////////////////////////////
 //////// CLASSE Piece ////////
 
-Piece::Piece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur)
-    : coordinates{coords}, operateurs{}, couleur{couleur}
+Piece::Piece(int indice, const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur)
+    : indice{0}, coordinates{coords}, operateurs{}, couleur{couleur}
 {}
 
 const std::vector<pair<int, int>>& Piece::getCoordinates() const {
@@ -39,11 +39,13 @@ void Piece::trigger(int mouseX, int mouseY, std::vector<int> &dataActuel) {
 }
 
 void Piece::accept(PieceOperateur &op, std::vector<int> &dataActuel) {
-    int nbCol{8};
+    int nbCol{8}; // TODO
     for (pair<int,int> &coord : coordinates) {
         dataActuel[coord.second * nbCol + coord.first] = 0;
+    }
+    for (pair<int,int> &coord : coordinates) {
         op.mapPosition(coord);
-        dataActuel[coord.second * nbCol + coord.first] = 2;
+        dataActuel[coord.second * nbCol + coord.first] = indice + 2;
     }
     for (PieceOperateur *otherOp : operateurs) {
         op.mapOperateur(*otherOp);

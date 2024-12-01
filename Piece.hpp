@@ -20,13 +20,14 @@ public:
 class Piece
 {
 public:
+	int indice;
 	std::vector<pair<int, int>> coordinates;
 	std::vector<PieceOperateur*> operateurs;
 	CouleurPiece couleur;
-private:
-	std::vector<sf::Vertex> sommets;
+// private:
+// 	std::vector<sf::Vertex> sommets;
 public:
-	Piece(const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
+	Piece(int indice, const std::vector<pair<int, int>> &coords, const CouleurPiece &couleur);
 	const std::vector<pair<int, int>>& getCoordinates() const;
 	OperateurDeplacement& ajouteOpDeplacement(const pair<int, int> &position, OperateurDeplacement::Orientation sens);
 	OperateurRotation& ajouteOpRotation(const pair<int, int> &position, OperateurRotation::Orientation sens);
