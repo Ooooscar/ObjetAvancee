@@ -52,7 +52,7 @@ all: Main
 # $^ : Référence à tous les fils d'une règle
 Piece: Piece.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
-Main: Main.o Niveau.o Piece.o PieceOperateur.o
+Main: Main.o Afficheur.o Afficheur.o Niveau.o Piece.o PieceOperateur.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 
