@@ -46,13 +46,14 @@ void AfficheurNiveau::allerAuNiveau(int indice)
 void AfficheurNiveau::demarrer()
 {
     fenetre.setTitle("PIECE OUT");
+    std::wstring message{L"Piece Out Niveau " + std::to_wstring(indiceNiveauActuel + 1)};
 
 	while (fenetre.isOpen())
 	{
 		sf::Vector2i posSourisAbsolue{sf::Mouse::getPosition(fenetre)};
 		sf::Vector2f posSouris{fenetre.mapPixelToCoords(posSourisAbsolue)};
 		        // important, si on redimensionne la fenêtre...
-		
+
         // la gestion des événements
 		sf::Event event;
 		while (fenetre.pollEvent(event))
@@ -68,10 +69,10 @@ void AfficheurNiveau::demarrer()
             {
             case Etat::ECRAN_PRINCIPAL:
                 break;
-            
+
             case Etat::ECRAN_SELECTION:
                 break;
-            
+
             case Etat::ECRAN_NIVEAU:
                 std::pair<int, int> caseChoisie{-1, -1};
                 if (event.type == sf::Event::MouseButtonPressed
@@ -86,13 +87,13 @@ void AfficheurNiveau::demarrer()
                             && niveauActuel.triggerPiece(indicePiece, caseChoisie)
                             && niveauActuel.estGagne())
                         {
-                            std::cout << "YOU WIN !!!" << std::endl;
+                            message = L"Vous avez gagné !";
                         }
                     }
                 break;
             }
         }
-        	
+
 		fenetre.clear();
 		fenetre.setView(fenetre.getDefaultView());
 
@@ -101,15 +102,21 @@ void AfficheurNiveau::demarrer()
         {
         case Etat::ECRAN_PRINCIPAL:
             break;
-        
+
         case Etat::ECRAN_SELECTION:
             break;
-        
+
         case Etat::ECRAN_NIVEAU:
             fenetre.draw(niveauActuel);
+            // TODO
+            sf::Text text{message, police};
+            text.setFillColor(sf::Color::White);
+            text.setCharacterSize(100); // en pixels
+            fenetre.draw(text);
+
             break;
         }
-		
+
         fenetre.display();
     }
 }
