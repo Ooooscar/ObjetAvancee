@@ -26,13 +26,13 @@ private:
     static const sf::Color COULEUR_DU_MUR;
     static const sf::Color COULEUR_DU_SOL;
 
+    std::vector<Piece> pieces;
+    std::vector<int> dataCasesActuelle;
+    
     float tailleCase;
     sf::RectangleShape panneauCentral;
     std::vector<sf::Vector2f> treillis;
     std::vector<sf::Vertex> sommetsTrame;
-
-    std::vector<Piece> pieces;
-    std::vector<int> dataCasesActuelle;
 
     friend class Piece;
 

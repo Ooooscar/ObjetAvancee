@@ -5,6 +5,8 @@
 
 class AfficheurNiveau
 {
+	enum Etat {ECRAN_PRINCIPAL, ECRAN_SELECTION, ECRAN_NIVEAU};
+
 private:
     static const sf::Color COULEUR_DU_MUR;
     static const sf::Color COULEUR_DU_SOL;
@@ -14,11 +16,18 @@ private:
     sf::Vector2f coordOrigine;
     float tailleCase;
 
+	Etat etat;
+
+	sf::Font police;
+
     int indiceNiveauActuel;
     Niveau niveauActuel;
 
 public:
     AfficheurNiveau(const std::vector<NiveauData> &niveaux);
+	// void gererEvenement(const sf::Event& event);
+	void chargerResources();
+
     void prochainNiveau();
     void allerAuNiveau(int indice);
     void demarrer();

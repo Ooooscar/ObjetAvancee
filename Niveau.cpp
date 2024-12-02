@@ -34,15 +34,26 @@ const sf::Color Niveau::COULEUR_DU_SOL = sf::Color{0xFFFFFCFF};
 
 Niveau::Niveau(const NiveauData &dataNiveau, const sf::Vector2f& coordCentre, float tailleCase) :
 	NiveauData{dataNiveau},
+	pieces{},
+	dataCasesActuelle{},
 	tailleCase{tailleCase},
 	panneauCentral{sf::RectangleShape(sf::Vector2f(nbCol * tailleCase, nbLigne * tailleCase))},
 	treillis{},
-	sommetsTrame{},
-	pieces{},
-	dataCasesActuelle{}
+	sommetsTrame{}
 {
 	panneauCentral.setPosition(coordCentre - panneauCentral.getSize() / 2.0f);
 	panneauCentral.setFillColor(COULEUR_DU_SOL);
+
+	pieces.reserve(dataPieces.size());
+	for (const PieceData &dataPiece : dataPieces) {
+		pieces.emplace_back(Piece(*this, static_cast<int>(pieces.size()), dataPiece));
+	}
+
+	dataCasesActuelle.reserve(dataCasesAttendue.size());
+	// Recopier les positions des murs de `dataCasesAttendue` dans `dataCasesActuelle`
+	for (int dataCase : dataCasesAttendue) {
+		dataCasesActuelle.emplace_back((dataCase == 1) ? 1 : 0);
+	}
 
 	treillis.reserve((nbCol + 1) * (nbLigne + 1));
 	float margeEnHaut = panneauCentral.getPosition().y;
@@ -59,37 +70,28 @@ Niveau::Niveau(const NiveauData &dataNiveau, const sf::Vector2f& coordCentre, fl
 		for (int x = 0; x < nbCol; ++x) {
 			int getDataAttendue = dataCasesAttendue[indiceCellule];
 			switch (getDataAttendue) {
-				case 0 :
-					break;
-				case 1 :
-					ajouterSommetsCellule(sommetsTrame, x, y, COULEUR_DU_MUR);
-					break;
-				default	:
-					int indicePiece = getDataAttendue - 2;
-					if (indicePiece < static_cast<int>(pieces.size()))
-						ajouterSommetsCellule(sommetsTrame, x, y, pieces[indicePiece].getCouleurSecondaire());
-					break;
+			case 0 :
+				break;
+			case 1 :
+				ajouterSommetsCellule(sommetsTrame, x, y, COULEUR_DU_MUR);
+				break;
+			default	:
+				int indicePiece = getDataAttendue - 2;
+				if (indicePiece < static_cast<int>(pieces.size()))
+					ajouterSommetsCellule(sommetsTrame, x, y, pieces[indicePiece].getCouleurSecondaire());
+				break;
 			}
 			++indiceCellule;
 		}
 	}
-
-	pieces.reserve(dataPieces.size());
-	for (const PieceData &dataPiece : dataPieces) {
-		pieces.emplace_back(Piece(*this, static_cast<int>(pieces.size()), dataPiece));
-	}
-
-	dataCasesActuelle.reserve(dataCasesAttendue.size());
-	// Recopier les positions des murs de `dataCasesAttendue` dans `dataCasesActuelle`
-	for (int dataCase : dataCasesAttendue) {
-		dataCasesActuelle.emplace_back((dataCase == 1) ? 1 : 0);
-	}
-	// Écriver les positions des `Piece` dans `dataCasesActuelle`
+	
 	for (Piece &piece : pieces) {
 		piece.sommets.reserve(piece.getCoordonnees().size() * 6);
-		for (const std::pair<int, int> &caseOccupee : piece.getCoordonnees()) {
-			redefinirData(caseOccupee, piece.getIndice() + 2);
+		for (const std::pair<int, int> &caseOccupee : piece.getCoordonnees()){
 			ajouterSommetsCellule(piece.sommets, caseOccupee.first, caseOccupee.second, piece.getCouleur());
+
+			// Écriver les positions des `Piece` dans `dataCasesActuelle`
+			redefinirData(caseOccupee, piece.getIndice() + 2);
 		}
 	}
 }
