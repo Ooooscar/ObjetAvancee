@@ -2,6 +2,7 @@
 #define _PIECEOUT_EBAUCHE_MODEL
 #include "PieceOperateur.hpp"
 #include <SFML/Graphics.hpp>
+#include <memory>
 #include <vector>
 #include <utility> // pour pair
 
@@ -24,10 +25,13 @@ protected:
 	std::vector<PieceOperateur*> operateurs;
 	CouleurPiece couleur;
 public:
-	PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur);
-	OperateurDeplacement& ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens);
-	OperateurRotation& ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens);
-	OperateurSymetrie& ajouterOpSymetrie(const std::pair<int, int> &position, OperateurSymetrie::Orientation sens);
+	virtual ~PieceData();
+	PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateur*> operateurs);
+	PieceData(const PieceData& other);
+private:
+	void ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens);
+	void ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens);
+	void ajouterOpSymetrie(const std::pair<int, int> &position, OperateurSymetrie::Orientation sens);
 };
 
 class Niveau;

@@ -6,26 +6,37 @@
 //////////////////////////////////
 //////// CLASSE PieceData ////////
 
-PieceData::PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur) :
+PieceData::PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateur*> operateurs) :
     coordonnees{coords},
-    operateurs{},
+    operateurs{operateurs},
     couleur{couleur}
 {}
 
-OperateurDeplacement& PieceData::ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens) {
-    OperateurDeplacement* op = new OperateurDeplacement{position, sens};
-    operateurs.emplace_back(op);
-    return *op;
+PieceData::PieceData(const PieceData& other) :
+    coordonnees{other.coordonnees},
+    operateurs{},
+    couleur{other.couleur}
+{
+    operateurs.reserve(other.operateurs.size());
+    for (const PieceOperateur *const op : other.operateurs) {
+        operateurs.push_back(op->clone());
+    }
 }
-OperateurRotation& PieceData::ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens) {
-    OperateurRotation* op = new OperateurRotation{position, sens};
-    operateurs.push_back(op);
-    return *op;
+
+PieceData::~PieceData() {
+    for (PieceOperateur *op : operateurs) {
+        delete op;
+    }
 }
-OperateurSymetrie& PieceData::ajouterOpSymetrie(const std::pair<int, int> &position, OperateurSymetrie::Orientation sens) {
-    OperateurSymetrie* op = new OperateurSymetrie{position, sens};
-    operateurs.push_back(op);
-    return *op;
+
+void PieceData::ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens) {
+    operateurs.emplace_back(new OperateurDeplacement{position, sens});
+}
+void PieceData::ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens) {
+    operateurs.emplace_back(new OperateurRotation{position, sens});
+}
+void PieceData::ajouterOpSymetrie(const std::pair<int, int> &position, OperateurSymetrie::Orientation sens) {
+    operateurs.emplace_back(new OperateurSymetrie{position, sens});
 }
 
 //////////////////////////////
@@ -47,7 +58,7 @@ const sf::Color& Piece::getCouleurSecondaire() const { return couleur.second; }
 
 bool Piece::trigger(const std::pair<int, int> &caseChoisie) {
     for (PieceOperateur *op : operateurs) {
-        if (caseChoisie == op->position) {
+        if (caseChoisie == op->getPosition()) {
             if (accepter(*op)) return true;
         }
     }

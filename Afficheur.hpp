@@ -19,6 +19,7 @@ private:
 	Etat etat;
 
 	sf::Font police;
+	sf::Font policeSymboles;
 
     int indiceNiveauActuel;
     Niveau niveauActuel;

@@ -15,7 +15,7 @@ protected:
 public:
     NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &casesAttendue);
     NiveauData(const int nbCol, const int nbLigne, std::vector<int> &&casesAttendue);
-    PieceData& ajouterPiece(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur);
+    void ajouterPiece(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateur*> operateurs);
 };
 
 class Niveau : private NiveauData, public sf::Drawable

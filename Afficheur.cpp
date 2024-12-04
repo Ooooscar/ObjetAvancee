@@ -27,8 +27,10 @@ AfficheurNiveau::AfficheurNiveau(const std::vector<NiveauData> &niveaux) :
 
 void AfficheurNiveau::chargerResources()
 {
-    if (!police.loadFromFile("resources/fonts/Montserrat-Medium.ttf")) {
-        std::cerr << "Erreur lors du chargement de la police" << std::endl;
+    if (!police.loadFromFile("resources/fonts/Montserrat-Medium.ttf")
+        || !policeSymboles.loadFromFile("resources/fonts/NotoSansSymbols2-Regular.ttf"))
+    {
+        std::cerr << "Erreur lors du chargement des polices" << std::endl;
         std::terminate();
     }
 }
@@ -113,6 +115,31 @@ void AfficheurNiveau::demarrer()
             text.setFillColor(sf::Color::White);
             text.setCharacterSize(100); // en pixels
             fenetre.draw(text);
+
+            sf::RectangleShape rect{sf::Vector2f{150,150}};
+            rect.setPosition(1000, 0);
+            rect.setFillColor(sf::Color::Blue);
+            fenetre.draw(rect);
+
+            // sf::Text text2{L"\x2B6E", policeSymboles};
+            // text2.setPosition(1000, 0);
+            // text2.setFillColor(sf::Color::White);
+            // text2.setCharacterSize(150); // en pixels
+            // fenetre.draw(text2);
+            sf::Glyph glyph = policeSymboles.getGlyph(L'\x2B6E', 150, false);
+            const sf::Texture& texture = policeSymboles.getTexture(150);
+            // Create a sprite to represent the glyph
+            sf::Sprite sprite;
+            sprite.setTexture(texture);
+            sprite.setTextureRect(glyph.textureRect);
+            // Set the position of the sprite
+            sprite.setPosition(1000.f, 0.f); // Adjust as needed
+            fenetre.draw(sprite);
+            
+            // if (glyph.textureRect == sf::IntRect())
+            // {
+            //     std::cout << "Glyph not available in the font!" << std::endl;
+            // }
 
             break;
         }

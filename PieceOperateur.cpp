@@ -4,8 +4,12 @@
 //////// CLASSE PieceOperateur ////////
 
 PieceOperateur::PieceOperateur(const std::pair<int,int> &position) :
-    position{std::move(position)}
+    position{position}
 {}
+
+const std::pair<int,int>& PieceOperateur::getPosition() const {
+    return position;
+};
 
 void PieceOperateur::accepter(const OperateurDeplacement &op) {
     op.mapPosition(position);
@@ -24,6 +28,10 @@ OperateurDeplacement::OperateurDeplacement(const std::pair<int,int> &position, O
     PieceOperateur{position},
     sens{sens}
 {}
+
+PieceOperateur* OperateurDeplacement::clone() const {
+    return new OperateurDeplacement{*this};
+}
 
 void OperateurDeplacement::mapPosition(std::pair<int, int> &pos) const {
     switch (sens) {
@@ -86,6 +94,10 @@ OperateurRotation::OperateurRotation(const std::pair<int,int> &position, Orienta
     sens{sens}
 {}
 
+PieceOperateur* OperateurRotation::clone() const {
+    return new OperateurRotation{*this};
+}
+
 void OperateurRotation::mapPosition(std::pair<int, int> &pos) const {
     switch (sens) {
     case HORAIRE :
@@ -120,6 +132,10 @@ OperateurSymetrie::OperateurSymetrie(const std::pair<int,int> &position, Orienta
     PieceOperateur{position},
     sens{sens}
 {}
+
+PieceOperateur* OperateurSymetrie::clone() const {
+    return new OperateurSymetrie{*this};
+}
 
 void OperateurSymetrie::mapPosition(std::pair<int, int> &pos) const {
     switch (sens) {

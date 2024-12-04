@@ -1,17 +1,26 @@
 #ifndef _PIECEOUT_PIECE_OPERATEUR
 #define _PIECEOUT_PIECE_OPERATEUR
+#include <memory> // pour unique_ptr
 #include <utility> // pour pair
 
+class Piece;
 class OperateurDeplacement;
 class OperateurRotation;
 class OperateurSymetrie;
 
 class PieceOperateur
 {
-public:
+protected:
 	std::pair<int, int> position;
+	virtual PieceOperateur* clone() const = 0;
+	friend class PieceData;
+
 public:
 	PieceOperateur(const std::pair<int,int> &position);
+	virtual ~PieceOperateur() = default;
+
+	const std::pair<int,int> &getPosition() const;
+
 	virtual void mapPosition(std::pair<int, int> &pos) const = 0;
 	virtual void mapOperateur(PieceOperateur &op) const = 0;
 
@@ -33,6 +42,8 @@ private:
 	Orientation sens;
 public:
 	OperateurDeplacement(const std::pair<int,int> &position, Orientation sens);
+	virtual PieceOperateur* clone() const;
+
 	virtual void mapPosition(std::pair<int, int> &pos) const;
 	virtual void mapOperateur(PieceOperateur &op) const;
 
@@ -48,6 +59,8 @@ public:
 	Orientation sens;
 public:
 	OperateurRotation(const std::pair<int,int> &position, Orientation sens);
+	virtual PieceOperateur* clone() const;
+
 	virtual void mapPosition(std::pair<int, int> &pos) const;
 	virtual void mapOperateur(PieceOperateur &op) const;
 
@@ -61,6 +74,8 @@ public:
 	Orientation sens;
 public:
 	OperateurSymetrie(const std::pair<int,int> &position, Orientation sens);
+	virtual PieceOperateur* clone() const;
+
 	virtual void mapPosition(std::pair<int, int> &pos) const;
 	virtual void mapOperateur(PieceOperateur &op) const;
 
