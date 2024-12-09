@@ -23,6 +23,14 @@ void PieceOperateurData::accepter(const OperateurSymetrie &op) {
     op.mapPosition(position);
 };
 
+///////////////////////////////////////
+//////// CLASSE PieceOperateur ////////
+
+PieceOperateur::PieceOperateur(Niveau &niveau, const PieceOperateur &dataPieceOperateur)
+    : PieceOperateurData{dataPieceOperateur}
+    , niveau{niveau}
+{}
+
 /////////////////////////////////////////////
 //////// CLASSE OperateurDeplacement ////////
 
@@ -158,11 +166,3 @@ void OperateurSymetrie::accepter(const OperateurRotation &op) {
     PieceOperateurData::accepter(op);
     sens = (sens == VERTICALE) ? HORIZONTALE : VERTICALE;
 }
-
-///////////////////////////////////////
-//////// CLASSE PieceOperateur ////////
-
-PieceOperateur::PieceOperateur(Niveau &niveau, const PieceOperateur &dataPieceOperateur)
-    : PieceOperateurData{dataPieceOperateur}
-    , niveau{niveau}
-{}

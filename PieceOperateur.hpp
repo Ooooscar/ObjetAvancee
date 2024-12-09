@@ -11,7 +11,7 @@ class OperateurSymetrie;
 
 class PieceOperateurData
 {
-protected:
+public:
 	std::pair<int, int> position;
 	virtual PieceOperateurData* clone() const = 0;
 	friend class PieceData;

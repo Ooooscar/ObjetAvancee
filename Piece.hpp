@@ -20,13 +20,14 @@ public:
 
 class PieceData
 {
-protected:
+// protected:
+public:
 	std::vector<std::pair<int, int>> coordonnees;
 	std::vector<PieceOperateurData*> operateurs;
 	CouleurPiece couleur;
 public:
 	virtual ~PieceData();
-	PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateurData*> operateurs);
+	PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur);
 	PieceData(const PieceData& other);
 	const std::vector<std::pair<int, int>>& getCoordonnees() const;
     const sf::Color& getCouleur() const;
@@ -39,7 +40,7 @@ private:
 
 class Niveau;
 
-class Piece : private PieceData, public sf::Drawable
+class Piece : public PieceData, public sf::Drawable
 {
 private:
 	Niveau &niveau;

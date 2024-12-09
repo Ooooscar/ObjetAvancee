@@ -11,15 +11,20 @@ protected:
     int nbCol;
     int nbLigne;
     std::vector<int> dataCasesAttendue;
-    std::vector<PieceData> dataPieces;
+    std::vector<int> dataCasesActuelle;
+	std::vector<PieceOperateurData*> dataOperateurs;
+    std::vector<CouleurPiece> couleurs;
 public:
-    NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &casesAttendue);
-    NiveauData(const int nbCol, const int nbLigne, std::vector<int> &&casesAttendue);
+    NiveauData( const int nbCol, const int nbLigne,
+                std::vector<int> &&casesAttendues, std::vector<int> &&casesActuelles,
+                std::initializer_list<PieceOperateurData*> operateurs,
+                std::initializer_list<CouleurPiece> couleurs );
     const int getDataAttendue(const std::pair<int, int> &caseChoisie) const;
-    void ajouterPiece(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateurData*> operateurs);
+    const int getDataActuelle(const std::pair<int, int> &caseChoisie) const;
+    void redefinirData(const std::pair<int, int> &caseChoisie, int valeur);
 };
 
-class Niveau : private NiveauData, public sf::Drawable
+class Niveau : public NiveauData, public sf::Drawable
 {
 public:
 
@@ -28,7 +33,6 @@ private:
     static const sf::Color COULEUR_DU_SOL;
 
     std::vector<Piece> pieces;
-    std::vector<int> dataCasesActuelle;
     
     float tailleCase;
     sf::RectangleShape panneauCentral;
@@ -39,8 +43,6 @@ private:
 
 public:
     Niveau(const NiveauData &dataNiveau, const sf::Vector2f& coordCentre, float tailleCase);
-    const int getDataActuelle(const std::pair<int, int> &caseChoisie) const;
-    void redefinirData(const std::pair<int, int> &caseChoisie, int valeur);
     bool triggerPiece(int indicePiece, const std::pair<int, int> &caseChoisie);
     const bool estGagne() const;
     

@@ -6,9 +6,9 @@
 //////////////////////////////////
 //////// CLASSE PieceData ////////
 
-PieceData::PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateurData*> operateurs)
+PieceData::PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur)
     : coordonnees{coords}
-    , operateurs{operateurs}
+    , operateurs{}
     , couleur{couleur}
 {}
 
