@@ -4,20 +4,24 @@
 ///////////////////////////////////
 //////// CLASSE NiveauData ////////
 
-NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &dataCasesAttendue) :
-	nbCol{nbCol},
-	nbLigne{nbLigne},
-	dataCasesAttendue{dataCasesAttendue},
-	dataPieces{}
+NiveauData::NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &dataCasesAttendue)
+	: nbCol{nbCol}
+	, nbLigne{nbLigne}
+	, dataCasesAttendue{dataCasesAttendue}
+	, dataPieces{}
 {}
-NiveauData::NiveauData(const int nbCol, const int nbLigne, std::vector<int> &&dataCasesAttendue) :
-	nbCol{nbCol},
-	nbLigne{nbLigne},
-	dataCasesAttendue{dataCasesAttendue},
-	dataPieces{}
+NiveauData::NiveauData(const int nbCol, const int nbLigne, std::vector<int> &&dataCasesAttendue)
+	: nbCol{nbCol}
+	, nbLigne{nbLigne}
+	, dataCasesAttendue{dataCasesAttendue}
+	, dataPieces{}
 {}
 
-void NiveauData::ajouterPiece(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateur*> operateurs) {
+const int NiveauData::getDataAttendue(const std::pair<int, int> &caseChoisie) const {
+	return dataCasesAttendue[caseChoisie.second * nbCol + caseChoisie.first];
+}
+
+void NiveauData::ajouterPiece(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateurData*> operateurs) {
 	dataPieces.emplace_back(PieceData{coords, couleur, operateurs});
 }
 
@@ -31,14 +35,14 @@ const sf::Color Niveau::COULEUR_DU_SOL = sf::Color{0xFFFFFCFF};
 
 //////// CONSTRUCTEURS ////////
 
-Niveau::Niveau(const NiveauData &dataNiveau, const sf::Vector2f& coordCentre, float tailleCase) :
-	NiveauData{dataNiveau},
-	pieces{},
-	dataCasesActuelle{},
-	tailleCase{tailleCase},
-	panneauCentral{sf::RectangleShape(sf::Vector2f(nbCol * tailleCase, nbLigne * tailleCase))},
-	treillis{},
-	sommetsTrame{}
+Niveau::Niveau(const NiveauData &dataNiveau, const sf::Vector2f& coordCentre, float tailleCase)
+	: NiveauData{dataNiveau}
+	, pieces{}
+	, dataCasesActuelle{}
+	, tailleCase{tailleCase}
+	, panneauCentral{sf::RectangleShape(sf::Vector2f(nbCol * tailleCase, nbLigne * tailleCase))}
+	, treillis{}
+	, sommetsTrame{}
 {
 	panneauCentral.setPosition(coordCentre - panneauCentral.getSize() / 2.0f);
 	panneauCentral.setFillColor(COULEUR_DU_SOL);
@@ -99,9 +103,6 @@ Niveau::Niveau(const NiveauData &dataNiveau, const sf::Vector2f& coordCentre, fl
 
 const int Niveau::getDataActuelle(const std::pair<int, int> &caseChoisie) const {
 	return dataCasesActuelle[caseChoisie.second * nbCol + caseChoisie.first];
-}
-const int Niveau::getDataAttendue(const std::pair<int, int> &caseChoisie) const {
-	return dataCasesAttendue[caseChoisie.second * nbCol + caseChoisie.first];
 }
 
 const bool Niveau::contient(const sf::Vector2f& posSouris) const {

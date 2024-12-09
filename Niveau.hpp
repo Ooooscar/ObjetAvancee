@@ -15,7 +15,8 @@ protected:
 public:
     NiveauData(const int nbCol, const int nbLigne, const std::vector<int> &casesAttendue);
     NiveauData(const int nbCol, const int nbLigne, std::vector<int> &&casesAttendue);
-    void ajouterPiece(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateur*> operateurs);
+    const int getDataAttendue(const std::pair<int, int> &caseChoisie) const;
+    void ajouterPiece(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateurData*> operateurs);
 };
 
 class Niveau : private NiveauData, public sf::Drawable
@@ -39,7 +40,6 @@ private:
 public:
     Niveau(const NiveauData &dataNiveau, const sf::Vector2f& coordCentre, float tailleCase);
     const int getDataActuelle(const std::pair<int, int> &caseChoisie) const;
-    const int getDataAttendue(const std::pair<int, int> &caseChoisie) const;
     void redefinirData(const std::pair<int, int> &caseChoisie, int valeur);
     bool triggerPiece(int indicePiece, const std::pair<int, int> &caseChoisie);
     const bool estGagne() const;

@@ -1,23 +1,25 @@
 #include "PieceOperateur.hpp"
+#define _USE_MATH_DEFINES //pour M_PI
+#include <cmath>
 
-///////////////////////////////////////
-//////// CLASSE PieceOperateur ////////
+///////////////////////////////////////////
+//////// CLASSE PieceOperateurData ////////
 
-PieceOperateur::PieceOperateur(const std::pair<int,int> &position) :
-    position{position}
+PieceOperateurData::PieceOperateurData(const std::pair<int,int> &position)
+    : position{position}
 {}
 
-const std::pair<int,int>& PieceOperateur::getPosition() const {
+const std::pair<int,int>& PieceOperateurData::getPosition() const {
     return position;
 };
 
-void PieceOperateur::accepter(const OperateurDeplacement &op) {
+void PieceOperateurData::accepter(const OperateurDeplacement &op) {
     op.mapPosition(position);
 }
-void PieceOperateur::accepter(const OperateurRotation &op) {
+void PieceOperateurData::accepter(const OperateurRotation &op) {
     op.mapPosition(position);
 };
-void PieceOperateur::accepter(const OperateurSymetrie &op) {
+void PieceOperateurData::accepter(const OperateurSymetrie &op) {
     op.mapPosition(position);
 };
 
@@ -25,11 +27,11 @@ void PieceOperateur::accepter(const OperateurSymetrie &op) {
 //////// CLASSE OperateurDeplacement ////////
 
 OperateurDeplacement::OperateurDeplacement(const std::pair<int,int> &position, Orientation sens) :
-    PieceOperateur{position},
+    PieceOperateurData{position},
     sens{sens}
 {}
 
-PieceOperateur* OperateurDeplacement::clone() const {
+PieceOperateurData* OperateurDeplacement::clone() const {
     return new OperateurDeplacement{*this};
 }
 
@@ -41,12 +43,12 @@ void OperateurDeplacement::mapPosition(std::pair<int, int> &pos) const {
     case OUEST : pos.first--; break;
     }
 }
-void OperateurDeplacement::mapOperateur(PieceOperateur &op) const {
+void OperateurDeplacement::mapOperateur(PieceOperateurData &op) const {
     op.accepter(*this);
 }
 
 void OperateurDeplacement::accepter(const OperateurRotation &op) {
-    PieceOperateur::accepter(op);
+    PieceOperateurData::accepter(op);
     switch (op.sens) {
     case OperateurRotation::HORAIRE :
         switch (sens) {
@@ -67,7 +69,7 @@ void OperateurDeplacement::accepter(const OperateurRotation &op) {
     }
 }
 void OperateurDeplacement::accepter(const OperateurSymetrie &op) {
-    PieceOperateur::accepter(op);
+    PieceOperateurData::accepter(op);
     switch (op.sens) {
     case OperateurSymetrie::VERTICALE :
         switch (sens) {
@@ -89,51 +91,50 @@ void OperateurDeplacement::accepter(const OperateurSymetrie &op) {
 //////////////////////////////////////////
 //////// CLASSE OperateurRotation ////////
 
-OperateurRotation::OperateurRotation(const std::pair<int,int> &position, Orientation sens) :
-    PieceOperateur{position},
-    sens{sens}
+OperateurRotation::OperateurRotation(const std::pair<int,int> &position, Orientation sens)
+    : PieceOperateurData{position}
+    , sens{sens}
 {}
 
-PieceOperateur* OperateurRotation::clone() const {
+PieceOperateurData* OperateurRotation::clone() const {
     return new OperateurRotation{*this};
 }
 
 void OperateurRotation::mapPosition(std::pair<int, int> &pos) const {
+    int firstTmp;
     switch (sens) {
     case HORAIRE :
         // Rotation 90° horarire : (x, y) -> (y, -x)
-        pos = std::move(std::make_pair<int>(
-                position.first - (pos.second - position.second),
-                position.second + (pos.first - position.first)
-            ));
+        firstTmp = position.first - (pos.second - position.second);
+        pos.second = position.second + (pos.first - position.first);
+        pos.first = firstTmp;
         break;
     case ANTIHORAIRE :
         // Rotation 90° anti-horarire : (x, y) -> (-y, x)
-        pos = std::move(std::make_pair<int>(
-                position.first + (pos.second - position.second),
-                position.second - (pos.first - position.first)
-            ));
+        firstTmp = position.first + (pos.second - position.second);
+        pos.second = position.second - (pos.first - position.first);
+        pos.first = firstTmp;
         break;
     }
 }
-void OperateurRotation::mapOperateur(PieceOperateur &op) const {
+void OperateurRotation::mapOperateur(PieceOperateurData &op) const {
     op.accepter(*this);
 }
 
 void OperateurRotation::accepter(const OperateurSymetrie &op) {
-    PieceOperateur::accepter(op);
+    PieceOperateurData::accepter(op);
     sens = (sens == HORAIRE) ? ANTIHORAIRE : HORAIRE;
 }
 
 //////////////////////////////////////////
 //////// CLASSE OperateurSymetrie ////////
 
-OperateurSymetrie::OperateurSymetrie(const std::pair<int,int> &position, Orientation sens) :
-    PieceOperateur{position},
-    sens{sens}
+OperateurSymetrie::OperateurSymetrie(const std::pair<int,int> &position, Orientation sens)
+    : PieceOperateurData{position}
+    , sens{sens}
 {}
 
-PieceOperateur* OperateurSymetrie::clone() const {
+PieceOperateurData* OperateurSymetrie::clone() const {
     return new OperateurSymetrie{*this};
 }
 
@@ -149,11 +150,19 @@ void OperateurSymetrie::mapPosition(std::pair<int, int> &pos) const {
         break;
     }
 }
-void OperateurSymetrie::mapOperateur(PieceOperateur &op) const {
+void OperateurSymetrie::mapOperateur(PieceOperateurData &op) const {
     op.accepter(*this);
 }
 
 void OperateurSymetrie::accepter(const OperateurRotation &op) {
-    PieceOperateur::accepter(op);
+    PieceOperateurData::accepter(op);
     sens = (sens == VERTICALE) ? HORIZONTALE : VERTICALE;
 }
+
+///////////////////////////////////////
+//////// CLASSE PieceOperateur ////////
+
+PieceOperateur::PieceOperateur(Niveau &niveau, const PieceOperateur &dataPieceOperateur)
+    : PieceOperateurData{dataPieceOperateur}
+    , niveau{niveau}
+{}

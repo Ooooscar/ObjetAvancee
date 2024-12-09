@@ -6,28 +6,32 @@
 //////////////////////////////////
 //////// CLASSE PieceData ////////
 
-PieceData::PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateur*> operateurs) :
-    coordonnees{coords},
-    operateurs{operateurs},
-    couleur{couleur}
+PieceData::PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateurData*> operateurs)
+    : coordonnees{coords}
+    , operateurs{operateurs}
+    , couleur{couleur}
 {}
 
-PieceData::PieceData(const PieceData& other) :
-    coordonnees{other.coordonnees},
-    operateurs{},
-    couleur{other.couleur}
+PieceData::PieceData(const PieceData& other)
+    : coordonnees{other.coordonnees}
+    , operateurs{}
+    , couleur{other.couleur}
 {
     operateurs.reserve(other.operateurs.size());
-    for (const PieceOperateur *const op : other.operateurs) {
+    for (const PieceOperateurData *const op : other.operateurs) {
         operateurs.push_back(op->clone());
     }
 }
 
 PieceData::~PieceData() {
-    for (PieceOperateur *op : operateurs) {
+    for (PieceOperateurData *op : operateurs) {
         delete op;
     }
 }
+
+const std::vector<std::pair<int, int>>& PieceData::getCoordonnees() const { return coordonnees; }
+const sf::Color& PieceData::getCouleur() const { return couleur.first; }
+const sf::Color& PieceData::getCouleurSecondaire() const { return couleur.second; }
 
 void PieceData::ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens) {
     operateurs.emplace_back(new OperateurDeplacement{position, sens});
@@ -42,22 +46,19 @@ void PieceData::ajouterOpSymetrie(const std::pair<int, int> &position, Operateur
 //////////////////////////////
 //////// CLASSE Piece ////////
 
-Piece::Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece) :
-    PieceData{dataPiece},
-    niveau{niveau},
-    indicePiece{indicePiece},
-    auBonEndroit{false},
-    sommets{}
+Piece::Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece)
+    : PieceData{dataPiece}
+    , niveau{niveau}
+    , indicePiece{indicePiece}
+    , auBonEndroit{false}
+    , sommets{}
 {}
 
 const int Piece::getIndice() const { return indicePiece; }
 const bool Piece::estAuBonEndroit() const { return auBonEndroit; }
-const std::vector<std::pair<int, int>>& Piece::getCoordonnees() const { return coordonnees; }
-const sf::Color& Piece::getCouleur() const { return couleur.first; }
-const sf::Color& Piece::getCouleurSecondaire() const { return couleur.second; }
 
 bool Piece::trigger(const std::pair<int, int> &caseChoisie) {
-    for (PieceOperateur *op : operateurs) {
+    for (PieceOperateurData *op : operateurs) {
         if (caseChoisie == op->getPosition()) {
             if (accepter(*op)) return true;
         }
@@ -65,7 +66,7 @@ bool Piece::trigger(const std::pair<int, int> &caseChoisie) {
     return false;
 }
 
-bool Piece::accepter(PieceOperateur &op) {
+bool Piece::accepter(PieceOperateurData &op) {
     for (std::pair<int, int> caseOccupee_copie : coordonnees) {
         op.mapPosition(caseOccupee_copie);
         int dataCible = niveau.getDataActuelle(caseOccupee_copie);
@@ -86,7 +87,7 @@ bool Piece::accepter(PieceOperateur &op) {
 		niveau.redefinirData(caseOccupee, indicePiece + 2);
 		niveau.ajouterSommetsCellule(sommets, caseOccupee.first, caseOccupee.second, getCouleur());
 	}
-    for (PieceOperateur *otherOp : operateurs) {
+    for (PieceOperateurData *otherOp : operateurs) {
         op.mapOperateur(*otherOp);
     }
     return true;
@@ -99,8 +100,8 @@ void Piece::draw(sf::RenderTarget &target, sf::RenderStates states) const {
 /////////////////////////////////////
 //////// CLASSE CouleurPiece ////////
 
-CouleurPiece::CouleurPiece(const sf::Color &piece, const sf::Color &cible) :
-    std::pair<sf::Color, sf::Color>{piece, cible}
+CouleurPiece::CouleurPiece(const sf::Color &piece, const sf::Color &cible)
+    : std::pair<sf::Color, sf::Color>{piece, cible}
 {}
 
 const CouleurPiece CouleurPiece::ROUGE {sf::Color{0xFD4030FF}, sf::Color{0xFEB0A9FF}};

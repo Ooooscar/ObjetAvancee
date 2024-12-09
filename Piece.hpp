@@ -22,12 +22,15 @@ class PieceData
 {
 protected:
 	std::vector<std::pair<int, int>> coordonnees;
-	std::vector<PieceOperateur*> operateurs;
+	std::vector<PieceOperateurData*> operateurs;
 	CouleurPiece couleur;
 public:
 	virtual ~PieceData();
-	PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateur*> operateurs);
+	PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur, std::initializer_list<PieceOperateurData*> operateurs);
 	PieceData(const PieceData& other);
+	const std::vector<std::pair<int, int>>& getCoordonnees() const;
+    const sf::Color& getCouleur() const;
+    const sf::Color& getCouleurSecondaire() const;
 private:
 	void ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens);
 	void ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens);
@@ -45,16 +48,12 @@ private:
 	std::vector<sf::Vertex> sommets;
 	friend class Niveau;
 public:
-	// Piece(int indicePiece, const PieceData &dataPiece, int tailleCase);
 	Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece);
 	const int getIndice() const;
 	const bool estAuBonEndroit() const;
-	const std::vector<std::pair<int, int>>& getCoordonnees() const;
-    const sf::Color& getCouleur() const;
-    const sf::Color& getCouleurSecondaire() const;
 
 	bool trigger(const std::pair<int, int> &caseChoisie);
-	bool accepter(PieceOperateur &op);
+	bool accepter(PieceOperateurData &op);
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 };
 

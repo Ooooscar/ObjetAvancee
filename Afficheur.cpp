@@ -5,19 +5,19 @@
 
 //////// CONSTRUCTEURS ////////
 
-AfficheurNiveau::AfficheurNiveau(const std::vector<NiveauData> &niveaux) :
+AfficheurNiveau::AfficheurNiveau(const std::vector<NiveauData> &niveaux)
 	// ici les deep-copies sont faites pour les `std::vector`
 	// TODO : éviter la copie de `std::vector<NiveauData>& niveaux` ici...
-	niveaux{niveaux},
-	fenetre{ { static_cast<unsigned int>(sf::VideoMode::getDesktopMode().width / 3) * 2,
-			   static_cast<unsigned int>(sf::VideoMode::getDesktopMode().height / 3) * 2 },
-			 "Piece Out" },
-	coordOrigine{fenetre.mapPixelToCoords(sf::Vector2i{fenetre.getSize()}) / 2.0f},
-	tailleCase{std::min(coordOrigine.x, coordOrigine.y) / 6.0f},
-    etat{ECRAN_NIVEAU},
-    police{},
-	indiceNiveauActuel{0},
-    niveauActuel{niveaux[0], coordOrigine, tailleCase}
+    : niveaux{niveaux}
+    , fenetre{ { static_cast<unsigned int>(sf::VideoMode::getDesktopMode().width / 3) * 2,
+			     static_cast<unsigned int>(sf::VideoMode::getDesktopMode().height / 3) * 2 },
+			   "Piece Out" }
+    , coordOrigine{fenetre.mapPixelToCoords(sf::Vector2i{fenetre.getSize()}) / 2.0f}
+	, tailleCase{std::min(coordOrigine.x, coordOrigine.y) / 6.0f}
+    , etat{ECRAN_NIVEAU}
+    , police{}
+	, indiceNiveauActuel{0}
+    , niveauActuel{niveaux[0], coordOrigine, tailleCase}
 {
     chargerResources();
 	fenetre.setFramerateLimit(30);
