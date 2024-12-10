@@ -44,7 +44,12 @@ void OperateurDeplacement::mapPosition(std::pair<int, int> &pos) const {
     }
 }
 void OperateurDeplacement::mapPosition(sf::Vector2f &pos, float t) const {
-    // TODO
+    switch (sens) {
+    case NORD : pos.y -= t; break;
+    case SUD : pos.y += t; break;
+    case EST : pos.x += t; break;
+    case OUEST : pos.x -= t; break;
+    }
 }
 void OperateurDeplacement::mapOperateur(PieceOperateurData &op) const {
     op.accepter(*this);
@@ -174,7 +179,14 @@ void OperateurSymetrie::mapPosition(std::pair<int, int> &pos) const {
     }
 }
 void OperateurSymetrie::mapPosition(sf::Vector2f &pos, float t) const {
-    // TODO
+    switch (sens) {
+    case VERTICALE :
+        pos.x += 2.0f * t * (position.first - pos.x);
+        break;
+    case HORIZONTALE :
+        pos.y += 2.0f * t * (position.second - pos.y);
+        break;
+    }
 }
 void OperateurSymetrie::mapOperateur(PieceOperateurData &op) const {
     op.accepter(*this);

@@ -1,5 +1,6 @@
 #include "Piece.hpp"
 #include "Niveau.hpp"
+#define _USE_MATH_DEFINES //pour M_PI
 #include <cmath>
 #include <iostream>
 
@@ -33,18 +34,20 @@ const std::vector<std::pair<int, int>>& PieceData::getCoordonnees() const { retu
 const sf::Color& PieceData::getCouleur() const { return couleur.first; }
 const sf::Color& PieceData::getCouleurSecondaire() const { return couleur.second; }
 
-void PieceData::ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens) {
-    operateurs.emplace_back(new OperateurDeplacement{position, sens});
-}
-void PieceData::ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens) {
-    operateurs.emplace_back(new OperateurRotation{position, sens});
-}
-void PieceData::ajouterOpSymetrie(const std::pair<int, int> &position, OperateurSymetrie::Orientation sens) {
-    operateurs.emplace_back(new OperateurSymetrie{position, sens});
-}
+// void PieceData::ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens) {
+//     operateurs.emplace_back(new OperateurDeplacement{position, sens});
+// }
+// void PieceData::ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens) {
+//     operateurs.emplace_back(new OperateurRotation{position, sens});
+// }
+// void PieceData::ajouterOpSymetrie(const std::pair<int, int> &position, OperateurSymetrie::Orientation sens) {
+//     operateurs.emplace_back(new OperateurSymetrie{position, sens});
+// }
 
-//////////////////////////////
+////////////////////////////// 
 //////// CLASSE Piece ////////
+
+const int Piece::DUREE_ANIMATION = 250;
 
 Piece::Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece)
     : PieceData{dataPiece}
@@ -52,7 +55,7 @@ Piece::Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece)
     , indicePiece{indicePiece}
     , sommets{}
     , auBonEndroit{false}
-    , enMouvement{false}
+    , operateurEnAction{nullptr}
 {}
 
 const int Piece::getIndice() const { return indicePiece; }
@@ -61,7 +64,11 @@ const bool Piece::estAuBonEndroit() const { return auBonEndroit; }
 bool Piece::trigger(const std::pair<int, int> &caseChoisie) {
     for (PieceOperateurData *op : operateurs) {
         if (caseChoisie == op->getPosition()) {
-            if (accepter(*op)) return true;
+            operateurEnAction = op;
+            if (accepter(*op))
+                return true;
+            else
+                return false;
         }
     }
     return false;
@@ -73,25 +80,50 @@ bool Piece::accepter(PieceOperateurData &op) {
         int dataCible = niveau.getDataActuelle(caseOccupee_copie);
         if (dataCible && dataCible != indicePiece + 2) {
             // donc cette nouvelle case à visiter est occupé
+            operateurEnAction = nullptr;
+            niveau.pieceEnMouvement = nullptr;
             return false;
         }
     }
     // Ici alors l'operation à accepter est valide
-    auBonEndroit = true;
-    sommets.clear();
-    for (const std::pair<int, int> &caseOccupee : coordonnees) {
-        niveau.redefinirData(caseOccupee, 0);
-    }
-	for (std::pair<int, int> &caseOccupee : coordonnees) {
-        op.mapPosition(caseOccupee);
-        auBonEndroit &= (niveau.getDataAttendue(caseOccupee) == indicePiece + 2);
-		niveau.redefinirData(caseOccupee, indicePiece + 2);
-		niveau.ajouterSommetsCellule(sommets, caseOccupee.first, caseOccupee.second, getCouleur());
-	}
-    for (PieceOperateurData *otherOp : operateurs) {
-        op.mapOperateur(*otherOp);
-    }
     return true;
+}
+
+void Piece::update(const sf::Time& temps) {
+    if (operateurEnAction != nullptr) {
+        float t = (float)temps.asMilliseconds() / DUREE_ANIMATION;
+        if (t >= 1.0f) {
+            t = 1.0f;
+        } else { // pour une animation plus satisfaisante
+            t = (1.0f - std::cos(M_PI * t)) * 0.5f;
+        }
+        sommets.clear();
+        for (std::pair<int, int> &caseOccupee : coordonnees) {
+            sf::Vector2f pos{(float)caseOccupee.first, (float)caseOccupee.second};
+            operateurEnAction->mapPosition(pos, t);
+            niveau.ajouterSommetsCellule(sommets, pos.x, pos.y, getCouleur());
+        }
+        if (t == 1.0f) {
+            // donc l'animation est finie
+            auBonEndroit = true;
+            for (const std::pair<int, int> &caseOccupee : coordonnees) {
+                niveau.redefinirData(caseOccupee, 0);
+            }
+            for (std::pair<int, int> &caseOccupee : coordonnees) {
+                operateurEnAction->mapPosition(caseOccupee);
+                auBonEndroit &= (niveau.getDataAttendue(caseOccupee) == indicePiece + 2);
+                niveau.redefinirData(caseOccupee, indicePiece + 2);
+            }
+            for (PieceOperateurData *otherOp : operateurs) {
+                operateurEnAction->mapOperateur(*otherOp);
+            }
+            operateurEnAction = nullptr;
+            niveau.pieceEnMouvement = nullptr;
+            if (auBonEndroit) {
+                niveau.updateGagne();
+            }
+        }
+    }
 }
 
 void Piece::draw(sf::RenderTarget &target, sf::RenderStates states) const {

@@ -32,10 +32,10 @@ public:
 	const std::vector<std::pair<int, int>>& getCoordonnees() const;
     const sf::Color& getCouleur() const;
     const sf::Color& getCouleurSecondaire() const;
-private:
-	void ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens);
-	void ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens);
-	void ajouterOpSymetrie(const std::pair<int, int> &position, OperateurSymetrie::Orientation sens);
+// private:
+	// void ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens);
+	// void ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens);
+	// void ajouterOpSymetrie(const std::pair<int, int> &position, OperateurSymetrie::Orientation sens);
 };
 
 class Niveau;
@@ -43,11 +43,12 @@ class Niveau;
 class Piece : public PieceData, public sf::Drawable
 {
 private:
+	static const int DUREE_ANIMATION;
 	Niveau &niveau;
 	const int indicePiece;
 	std::vector<sf::Vertex> sommets;
 	bool auBonEndroit;
-	bool enMouvement;
+	PieceOperateurData* operateurEnAction;
 	friend class Niveau;
 public:
 	Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece);
@@ -56,6 +57,7 @@ public:
 
 	bool trigger(const std::pair<int, int> &caseChoisie);
 	bool accepter(PieceOperateurData &op);
+	void update(const sf::Time& temps);
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 };
 

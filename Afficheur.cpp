@@ -50,6 +50,8 @@ void AfficheurNiveau::demarrer()
     fenetre.setTitle("PIECE OUT");
     std::wstring message{L"Piece Out Niveau " + std::to_wstring(indiceNiveauActuel + 1)};
 
+    // bool isMousePressed = false;
+
 	while (fenetre.isOpen())
 	{
 		sf::Vector2i posSourisAbsolue{sf::Mouse::getPosition(fenetre)};
@@ -58,6 +60,7 @@ void AfficheurNiveau::demarrer()
 
         // la gestion des événements
 		sf::Event event;
+
 		while (fenetre.pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed
@@ -76,22 +79,35 @@ void AfficheurNiveau::demarrer()
                 break;
 
             case Etat::ECRAN_NIVEAU:
-                std::pair<int, int> caseChoisie{-1, -1};
-                if (event.type == sf::Event::MouseButtonPressed
-                    && event.mouseButton.button == sf::Mouse::Left
-                    && niveauActuel.contient(posSouris))
+
+                if (!niveauActuel.estEnMouvement())
+                {
+                    std::pair<int, int> caseChoisie{-1, -1};
+                    // if (!isMousePressed)
+                    // {
+                    //     if (event.type == sf::Event::MouseButtonPressed
+                    //         && event.mouseButton.button == sf::Mouse::Left
+                    //         && niveauActuel.contient(posSouris))
+                    //     {
+                    //         isMousePressed = true;
+                    //     }
+                    // }
+                    // if (isMousePressed)
+                    // {
+                    if (event.type == sf::Event::MouseButtonReleased
+                        && event.mouseButton.button == sf::Mouse::Left
+                        && niveauActuel.contient(posSouris))
                     {
+                        // std::cout << "Mouse released" << std::endl;
                         caseChoisie = niveauActuel.mapPixelsEnCases(posSouris);
                         // std::cout << "trigger " << caseChoisie.first << " "
                         //                         << caseChoisie.second << std::endl;
                         int indicePiece = niveauActuel.getDataActuelle(caseChoisie) - 2;
-                        if (indicePiece >= 0
-                            && niveauActuel.triggerPiece(indicePiece, caseChoisie)
-                            && niveauActuel.estGagne())
-                        {
-                            message = L"Vous avez gagné !";
+                        if (indicePiece >= 0) {
+                            niveauActuel.triggerPiece(indicePiece, caseChoisie);
                         }
                     }
+                }
                 break;
             }
         }
@@ -109,6 +125,13 @@ void AfficheurNiveau::demarrer()
             break;
 
         case Etat::ECRAN_NIVEAU:
+            if (niveauActuel.estEnMouvement()) {
+                niveauActuel.updateAnimation();
+                if (!niveauActuel.estEnMouvement() && niveauActuel.estGagne()) {
+                    message = L"Vous avez gagné !";
+                }
+            }
+                        
             fenetre.draw(niveauActuel);
             // TODO
             sf::Text text{message, police};

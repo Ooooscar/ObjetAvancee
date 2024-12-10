@@ -26,17 +26,18 @@ public:
 
 class Niveau : public NiveauData, public sf::Drawable
 {
+// private:
 public:
-
-private:
     static const sf::Color COULEUR_DU_MUR;
     static const sf::Color COULEUR_DU_SOL;
 
     std::vector<Piece> pieces;
-    
+    sf::Clock horloge;
+    Piece* pieceEnMouvement;
+    bool gagne;
+
     float tailleCase;
     sf::RectangleShape panneauCentral;
-    std::vector<sf::Vector2f> treillis;
     std::vector<sf::Vertex> sommetsTrame;
 
     friend class Piece;
@@ -44,14 +45,17 @@ private:
 public:
     Niveau(const NiveauData &dataNiveau, const sf::Vector2f& coordCentre, float tailleCase);
     bool triggerPiece(int indicePiece, const std::pair<int, int> &caseChoisie);
+    const bool estEnMouvement() const;
     const bool estGagne() const;
     
     const bool contient(const sf::Vector2f &posSouris) const;
     std::pair<int, int> mapPixelsEnCases(const sf::Vector2f &posSouris) const;
+    void updateGagne();
+    void updateAnimation();
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 private:
-    void genererTreillis();
-    void ajouterSommetsCellule(std::vector<sf::Vertex>& trame, int x, int y, const sf::Color& couleur);
+    // void ajouterSommetsCellule(std::vector<sf::Vertex>& trame, int x, int y, const sf::Color& couleur);
+    void ajouterSommetsCellule(std::vector<sf::Vertex>& trame, float x, float y, const sf::Color& couleur);
 };
 
 #endif
