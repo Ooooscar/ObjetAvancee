@@ -50,8 +50,9 @@ Piece::Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece)
     : PieceData{dataPiece}
     , niveau{niveau}
     , indicePiece{indicePiece}
-    , auBonEndroit{false}
     , sommets{}
+    , auBonEndroit{false}
+    , enMouvement{false}
 {}
 
 const int Piece::getIndice() const { return indicePiece; }

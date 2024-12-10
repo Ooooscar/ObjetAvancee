@@ -45,8 +45,9 @@ class Piece : public PieceData, public sf::Drawable
 private:
 	Niveau &niveau;
 	const int indicePiece;
-	bool auBonEndroit;
 	std::vector<sf::Vertex> sommets;
+	bool auBonEndroit;
+	bool enMouvement;
 	friend class Niveau;
 public:
 	Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece);

@@ -23,17 +23,12 @@ public:
 	const std::pair<int,int> &getPosition() const;
 
 	virtual void mapPosition(std::pair<int, int> &pos) const = 0;
-	// virtual void mapSommet(sf::Vector2f &pos, float t) const = 0;
+	virtual void mapPosition(sf::Vector2f &pos, float t) const = 0;
 	virtual void mapOperateur(PieceOperateurData &op) const = 0;
 
 	virtual void accepter(const OperateurDeplacement &op);
 	virtual void accepter(const OperateurRotation &op);
 	virtual void accepter(const OperateurSymetrie &op);
-	// virtual void visit(PieceData &p) const;
-	
-	// virtual void visit(OperateurDeplacement &) const = 0;
-	//virtual void visit(OperateurRotation &) const = 0;
-	//virtual void visit(OperateurSymetrie &) const = 0;
 };
 
 class OperateurDeplacement : public PieceOperateurData
@@ -47,7 +42,7 @@ public:
 	virtual PieceOperateurData* clone() const;
 
 	virtual void mapPosition(std::pair<int, int> &pos) const;
-	// virtual void mapSommet(sf::Vector2f &pos, float t) const;
+	virtual void mapPosition(sf::Vector2f &pos, float t) const;
 	virtual void mapOperateur(PieceOperateurData &op) const;
 
 	virtual void accepter(const OperateurRotation &op);
@@ -65,7 +60,7 @@ public:
 	virtual PieceOperateurData* clone() const;
 
 	virtual void mapPosition(std::pair<int, int> &pos) const;
-	// virtual void mapSommet(sf::Vector2f &pos, float t) const;
+	virtual void mapPosition(sf::Vector2f &pos, float t) const;
 	virtual void mapOperateur(PieceOperateurData &op) const;
 
 	virtual void accepter(const OperateurSymetrie &op);
@@ -81,21 +76,10 @@ public:
 	virtual PieceOperateurData* clone() const;
 
 	virtual void mapPosition(std::pair<int, int> &pos) const;
-	// virtual void mapSommet(sf::Vector2f &pos, float t) const;
+	virtual void mapPosition(sf::Vector2f &pos, float t) const;
 	virtual void mapOperateur(PieceOperateurData &op) const;
 
 	virtual void accepter(const OperateurRotation &op);
-};
-
-class Niveau;
-
-class PieceOperateur : private PieceOperateurData//, public sf::Drawable
-{
-private:
-	Niveau &niveau;
-	sf::Vector2f origine;
-public:
-	PieceOperateur(Niveau &niveau, const PieceOperateur &dataPieceOperateur);
 };
 
 #endif

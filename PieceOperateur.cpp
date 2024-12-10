@@ -11,32 +11,24 @@ PieceOperateurData::PieceOperateurData(const std::pair<int,int> &position)
 
 const std::pair<int,int>& PieceOperateurData::getPosition() const {
     return position;
-};
+}
 
 void PieceOperateurData::accepter(const OperateurDeplacement &op) {
     op.mapPosition(position);
 }
 void PieceOperateurData::accepter(const OperateurRotation &op) {
     op.mapPosition(position);
-};
+}
 void PieceOperateurData::accepter(const OperateurSymetrie &op) {
     op.mapPosition(position);
-};
-
-///////////////////////////////////////
-//////// CLASSE PieceOperateur ////////
-
-PieceOperateur::PieceOperateur(Niveau &niveau, const PieceOperateur &dataPieceOperateur)
-    : PieceOperateurData{dataPieceOperateur}
-    , niveau{niveau}
-{}
+}
 
 /////////////////////////////////////////////
 //////// CLASSE OperateurDeplacement ////////
 
-OperateurDeplacement::OperateurDeplacement(const std::pair<int,int> &position, Orientation sens) :
-    PieceOperateurData{position},
-    sens{sens}
+OperateurDeplacement::OperateurDeplacement(const std::pair<int,int> &position, Orientation sens)
+    : PieceOperateurData{position}
+    , sens{sens}
 {}
 
 PieceOperateurData* OperateurDeplacement::clone() const {
@@ -50,6 +42,9 @@ void OperateurDeplacement::mapPosition(std::pair<int, int> &pos) const {
     case EST : pos.first++; break;
     case OUEST : pos.first--; break;
     }
+}
+void OperateurDeplacement::mapPosition(sf::Vector2f &pos, float t) const {
+    // TODO
 }
 void OperateurDeplacement::mapOperateur(PieceOperateurData &op) const {
     op.accepter(*this);
@@ -115,15 +110,35 @@ void OperateurRotation::mapPosition(std::pair<int, int> &pos) const {
         // Rotation 90° horarire : (x, y) -> (y, -x)
         firstTmp = position.first - (pos.second - position.second);
         pos.second = position.second + (pos.first - position.first);
-        pos.first = firstTmp;
         break;
     case ANTIHORAIRE :
         // Rotation 90° anti-horarire : (x, y) -> (-y, x)
         firstTmp = position.first + (pos.second - position.second);
         pos.second = position.second - (pos.first - position.first);
-        pos.first = firstTmp;
         break;
     }
+    pos.first = firstTmp;
+}
+void OperateurRotation::mapPosition(sf::Vector2f &pos, float t) const {
+    float angleEnRad = M_PI * 0.5f * t;
+    float cosinus = std::cos(angleEnRad);
+    float sinus = std::sin(angleEnRad);
+    float dx = pos.x - position.first;
+    float dy = pos.y - position.second;
+    float xTmp;
+    switch (sens) {
+    case HORAIRE :
+        // Rotation 90t° horarire
+        xTmp = position.first + cosinus * dx - sinus * dy;
+        pos.y = position.second + sinus * dx + cosinus * dy;
+        break;
+    case ANTIHORAIRE :
+        // Rotation 90t° anti-horarire
+        xTmp = position.first + cosinus * dx + sinus * dy;
+        pos.y = position.second - sinus * dx + cosinus * dy;
+        break;
+    }
+    pos.x = xTmp;
 }
 void OperateurRotation::mapOperateur(PieceOperateurData &op) const {
     op.accepter(*this);
@@ -157,6 +172,9 @@ void OperateurSymetrie::mapPosition(std::pair<int, int> &pos) const {
         pos.second = 2*position.second - pos.second;
         break;
     }
+}
+void OperateurSymetrie::mapPosition(sf::Vector2f &pos, float t) const {
+    // TODO
 }
 void OperateurSymetrie::mapOperateur(PieceOperateurData &op) const {
     op.accepter(*this);
