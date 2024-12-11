@@ -26,13 +26,12 @@ public:
 
 class Niveau : public NiveauData, public sf::Drawable
 {
-// private:
-public:
+private:
     static const sf::Color COULEUR_DU_MUR;
     static const sf::Color COULEUR_DU_SOL;
 
     std::vector<Piece> pieces;
-    sf::Clock horloge;
+    sf::Clock minuterieAnimation;
     Piece* pieceEnMouvement;
     bool gagne;
 

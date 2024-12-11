@@ -40,7 +40,7 @@ const sf::Color Niveau::COULEUR_DU_SOL = sf::Color{0xFFFFFCFF};
 Niveau::Niveau(const NiveauData &dataNiveau, const sf::Vector2f& coordCentre, float tailleCase)
 	: NiveauData{dataNiveau}
 	, pieces{}
-	, horloge{}
+	, minuterieAnimation{}
 	, pieceEnMouvement{nullptr}
 	, gagne{false}
 	, tailleCase{tailleCase}
@@ -119,7 +119,7 @@ std::pair<int, int> Niveau::mapPixelsEnCases(const sf::Vector2f& posSouris) cons
 
 bool Niveau::triggerPiece(int indicePiece, const std::pair<int, int> &caseChoisie) {
 	pieceEnMouvement = &pieces[indicePiece];
-	horloge.restart();
+	minuterieAnimation.restart();
 	return pieces[indicePiece].trigger(caseChoisie);
 }
 
@@ -140,7 +140,7 @@ void Niveau::updateGagne() {
 }
 
 void Niveau::updateAnimation() {
-	pieceEnMouvement->update(horloge.getElapsedTime());
+	pieceEnMouvement->update(minuterieAnimation.getElapsedTime());
 }
 
 void Niveau::draw(sf::RenderTarget &target, sf::RenderStates states) const {

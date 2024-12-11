@@ -20,8 +20,7 @@ public:
 
 class PieceData
 {
-// protected:
-public:
+protected:
 	std::vector<std::pair<int, int>> coordonnees;
 	std::vector<PieceOperateurData*> operateurs;
 	CouleurPiece couleur;
@@ -49,7 +48,9 @@ private:
 	std::vector<sf::Vertex> sommets;
 	bool auBonEndroit;
 	PieceOperateurData* operateurEnAction;
+
 	friend class Niveau;
+
 public:
 	Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece);
 	const int getIndice() const;

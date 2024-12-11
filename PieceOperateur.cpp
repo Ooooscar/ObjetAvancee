@@ -34,6 +34,9 @@ OperateurDeplacement::OperateurDeplacement(const std::pair<int,int> &position, O
 PieceOperateurData* OperateurDeplacement::clone() const {
     return new OperateurDeplacement{*this};
 }
+const OperateurDeplacement::Orientation OperateurDeplacement::getSens() const {
+    return sens;
+}
 
 void OperateurDeplacement::mapPosition(std::pair<int, int> &pos) const {
     switch (sens) {
@@ -57,7 +60,7 @@ void OperateurDeplacement::mapOperateur(PieceOperateurData &op) const {
 
 void OperateurDeplacement::accepter(const OperateurRotation &op) {
     PieceOperateurData::accepter(op);
-    switch (op.sens) {
+    switch (op.getSens()) {
     case OperateurRotation::HORAIRE :
         switch (sens) {
         case EST : sens = SUD; break;
@@ -78,7 +81,7 @@ void OperateurDeplacement::accepter(const OperateurRotation &op) {
 }
 void OperateurDeplacement::accepter(const OperateurSymetrie &op) {
     PieceOperateurData::accepter(op);
-    switch (op.sens) {
+    switch (op.getSens()) {
     case OperateurSymetrie::VERTICALE :
         switch (sens) {
         case EST : sens = OUEST; break;
@@ -106,6 +109,9 @@ OperateurRotation::OperateurRotation(const std::pair<int,int> &position, Orienta
 
 PieceOperateurData* OperateurRotation::clone() const {
     return new OperateurRotation{*this};
+}
+const OperateurRotation::Orientation OperateurRotation::getSens() const {
+    return sens;
 }
 
 void OperateurRotation::mapPosition(std::pair<int, int> &pos) const {
@@ -164,6 +170,9 @@ OperateurSymetrie::OperateurSymetrie(const std::pair<int,int> &position, Orienta
 
 PieceOperateurData* OperateurSymetrie::clone() const {
     return new OperateurSymetrie{*this};
+}
+const OperateurSymetrie::Orientation OperateurSymetrie::getSens() const {
+    return sens;
 }
 
 void OperateurSymetrie::mapPosition(std::pair<int, int> &pos) const {

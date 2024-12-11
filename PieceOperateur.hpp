@@ -11,14 +11,14 @@ class OperateurSymetrie;
 
 class PieceOperateurData
 {
-public:
+protected:
 	std::pair<int, int> position;
-	virtual PieceOperateurData* clone() const = 0;
 	friend class PieceData;
 
 public:
 	PieceOperateurData(const std::pair<int,int> &position);
 	virtual ~PieceOperateurData() = default;
+	virtual PieceOperateurData* clone() const = 0;
 
 	const std::pair<int,int> &getPosition() const;
 
@@ -40,6 +40,7 @@ private:
 public:
 	OperateurDeplacement(const std::pair<int,int> &position, Orientation sens);
 	virtual PieceOperateurData* clone() const;
+	const Orientation getSens() const;
 
 	virtual void mapPosition(std::pair<int, int> &pos) const;
 	virtual void mapPosition(sf::Vector2f &pos, float t) const;
@@ -53,11 +54,12 @@ class OperateurRotation : public PieceOperateurData
 {
 public:
 	enum Orientation {HORAIRE, ANTIHORAIRE};
-public:
+private:
 	Orientation sens;
 public:
 	OperateurRotation(const std::pair<int,int> &position, Orientation sens);
 	virtual PieceOperateurData* clone() const;
+	const Orientation getSens() const;
 
 	virtual void mapPosition(std::pair<int, int> &pos) const;
 	virtual void mapPosition(sf::Vector2f &pos, float t) const;
@@ -70,10 +72,12 @@ class OperateurSymetrie : public PieceOperateurData
 {
 public:
 	enum Orientation {VERTICALE, HORIZONTALE};
+private:
 	Orientation sens;
 public:
 	OperateurSymetrie(const std::pair<int,int> &position, Orientation sens);
 	virtual PieceOperateurData* clone() const;
+	const Orientation getSens() const;
 
 	virtual void mapPosition(std::pair<int, int> &pos) const;
 	virtual void mapPosition(sf::Vector2f &pos, float t) const;
