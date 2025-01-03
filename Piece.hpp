@@ -1,65 +1,102 @@
-#ifndef _PIECEOUT_EBAUCHE_MODEL
-#define _PIECEOUT_EBAUCHE_MODEL
-#include "PieceOperateur.hpp"
+#ifndef _PIECEOUT_PIECE
+#define _PIECEOUT_PIECE
+#include "Operator.hpp"
+#include "DrawableShape.hpp"
 #include <SFML/Graphics.hpp>
-#include <memory>
-#include <vector>
-#include <utility> // pour pair
+#include <array>
 
-class CouleurPiece : public std::pair<sf::Color, sf::Color>
+class PieceColor
 {
 public:
-    CouleurPiece(const sf::Color &piece, const sf::Color &cible);
-    static const CouleurPiece ROUGE;
-    static const CouleurPiece ORANGE;
-    static const CouleurPiece VERT;
-    static const CouleurPiece CYAN;
-    static const CouleurPiece BLEU;
-    static const CouleurPiece VIOLET;
+    sf::Color primaryColor;
+    sf::Color backgroundColor;
+    PieceColor(const sf::Color& primaryColor, const sf::Color& backgroundColor);
+
+    static const PieceColor WALL;
+    static const PieceColor RED;
+    static const PieceColor ORANGE;
+    static const PieceColor GREEN;
+    static const PieceColor CYAN;
+    static const PieceColor BLUE;
+    static const PieceColor PURPLE;
+};
+
+enum Direction
+{
+    E = 0,
+    S = 1,
+    W = 2,
+    N = 3,
+};
+
+enum ActionResponse
+{
+    INVALID,
+    REJECTED,
+    ACCEPTED,
 };
 
 class PieceData
 {
 protected:
-	std::vector<std::pair<int, int>> coordonnees;
-	std::vector<PieceOperateurData*> operateurs;
-	CouleurPiece couleur;
+	std::vector<sf::Vector2i> gridCoords;
+	PieceColor color;
 public:
-	virtual ~PieceData();
-	PieceData(const std::vector<std::pair<int, int>> &coords, const CouleurPiece &couleur);
-	PieceData(const PieceData& other);
-	const std::vector<std::pair<int, int>>& getCoordonnees() const;
-    const sf::Color& getCouleur() const;
-    const sf::Color& getCouleurSecondaire() const;
-// private:
-	// void ajouterOpDeplacement(const std::pair<int, int> &position, OperateurDeplacement::Orientation sens);
-	// void ajouterOpRotation(const std::pair<int, int> &position, OperateurRotation::Orientation sens);
-	// void ajouterOpSymetrie(const std::pair<int, int> &position, OperateurSymetrie::Orientation sens);
+	PieceData(const std::vector<sf::Vector2i>& gridCoords, const PieceColor& color);
+
+    void emplaceCell(const sf::Vector2i& gridPos);
 };
 
-class Niveau;
+class Level;
 
-class Piece : public PieceData, public sf::Drawable
+class Piece : public PieceData, public DrawableShape
 {
 private:
-	static const int DUREE_ANIMATION;
-	Niveau &niveau;
-	const int indicePiece;
-	std::vector<sf::Vertex> sommets;
-	bool auBonEndroit;
-	PieceOperateurData* operateurEnAction;
+    Level& level;
+    const int pieceIdx;
 
-	friend class Niveau;
+    std::array<Operator*, 4> movementOperators;
+	std::vector<Operator*> mainOperators;
 
+    std::vector<sf::Vertex> vertexArrayOld;
+    sf::Clock* animationTimer;
+    bool hasCorrectPosition;
+    bool atCorrectPosition;
+
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 public:
-	Piece(Niveau &niveau, int indicePiece, const PieceData &dataPiece);
-	const int getIndice() const;
-	const bool estAuBonEndroit() const;
+    Piece(const PieceData& data, Level& level, int pieceIdx);
 
-	bool trigger(const std::pair<int, int> &caseChoisie);
-	bool accepter(PieceOperateurData &op);
-	void update(const sf::Time& temps);
-	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
+    virtual ~Piece();
+    Piece(const Piece&) = delete;
+    Piece& operator=(const Piece&) = delete;
+    Piece(Piece&&) = default;
+    Piece& operator=(Piece&&) = delete;
+
+    const Level& getLevel() const;
+    const int getIndex() const;
+    const bool isAtCorrectPosition() const;
+    const bool isInAnimation() const;
+    const bool canMoveInDirection(Direction direction) const;
+
+    bool addOperator(Operator& op);
+    void setHasCorrectPosition();
+
+    void transformWorldCoords(const sf::Transform& transform);
+    void move(int direction, float progress);
+    void rotate(const sf::Vector2f& originWorldPos, float angleInRad);
+    void flipVertical(const sf::Vector2f& originWorldPos, float progress);
+    void flipHorizontal(const sf::Vector2f& originWorldPos, float progress);
+
+    ActionResponse onSlide(Direction direction);
+    ActionResponse onClick(const sf::Vector2i& gridPos);
+    ActionResponse trigger(Operator& op);
+    void accept(Operator& op);
+    void reject(Operator& op);
+
+    void update();
+    void initializeAnimation();
+    void endAnimation();
 };
 
 #endif

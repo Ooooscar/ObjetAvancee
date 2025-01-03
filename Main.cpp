@@ -1,10 +1,10 @@
-#include "Afficheur.hpp"
+#include "Renderer.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
 int main()
 {
-	std::vector<NiveauData> niveaux{
+	std::vector<LevelData> levels{
 		{
 			9, 8,
 			{
@@ -23,21 +23,26 @@ int main()
 				1,2,2,2,0,0,0,3,1,
 				1,1,1,0,0,0,0,3,1,
 				1,1,1,0,0,0,0,0,1,
-				1,1,0,0,0,0,0,0,1,
+				1,1,0,4,0,0,0,0,1,
 				1,1,1,1,1,1,0,0,1,
 				1,1,1,1,1,1,1,1,1,
 			},
 			{
-				new OperateurDeplacement{{1,2}, OperateurDeplacement::OUEST},
-				new OperateurDeplacement{{3,2}, OperateurDeplacement::EST},
-				new OperateurRotation{{2,2}, OperateurRotation::ANTIHORAIRE},
-				new OperateurDeplacement{{7,1}, OperateurDeplacement::NORD},
-				new OperateurDeplacement{{7,3}, OperateurDeplacement::SUD},
-				new OperateurSymetrie{{7,2}, OperateurSymetrie::HORIZONTALE}
+				{MOV_W, {1,2}},
+				{MOV_E, {3,2}},
+				{ROT_CCW, {2,2}},
+				{MOV_N, {7,1}},
+				{MOV_S, {7,3}},
+				{FLP_VRT, {7,2}},
+				{MOV_E, {3,5}},
+				{MOV_W, {3,5}},
+				{MOV_S, {3,5}},
+				{MOV_N, {3,5}},
 			},
 			{
-				CouleurPiece::VERT,
-				CouleurPiece::BLEU
+				PieceColor::GREEN,
+				PieceColor::BLUE,
+				PieceColor::RED,
 			}
 		},
 		// {
@@ -54,14 +59,8 @@ int main()
 		// }
 	};
 
-	// PieceData &p10 = niveaux[1].ajouterPiece({{2,1},{2,2},{2,3},{3,2}}, CouleurPiece::VERT);
-	// p10.ajouterOpDeplacement({2,1}, OperateurDeplacement::NORD);
-	// p10.ajouterOpDeplacement({2,3}, OperateurDeplacement::SUD);
-	// p10.ajouterOpRotation({2,2}, OperateurRotation::ANTIHORAIRE);
-	// std::cout << op.position.first << ", " << op.position.second << std::endl;
-
-	AfficheurNiveau afficheurNiveau{niveaux};
-    afficheurNiveau.demarrer();
+	Renderer gameRenderer{levels};
+    gameRenderer.run();
 
     return EXIT_SUCCESS;
 }
