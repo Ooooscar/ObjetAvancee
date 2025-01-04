@@ -6,13 +6,11 @@
 class Renderer
 {
 private:
-    const std::vector<LevelData> levels;
+    // const std::vector<LevelData> levels;
     sf::RenderWindow window;
-    sf::Vector2f centerCoords;
-    float gridSizeInPixels;
-    Level* currentLevel;
 public:
-    Renderer(const std::vector<LevelData>& levels);
+    // Renderer(const std::vector<LevelData>& levels);
+    Renderer();
     void run();
 };
 

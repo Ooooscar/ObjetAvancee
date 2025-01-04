@@ -1,27 +1,102 @@
-#include "LevelEventHandler.hpp"
+#include "GameStateMachine.hpp"
+#include "Button.hpp"
+#include "LevelManager.hpp"
 #include "Level.hpp"
 
-GameStateContext::GameStateContext(Level* level)
-    : currentState{new LevelStateIdle(level, {-1, -1})}
+GameStateMachine::GameStateMachine(sf::RenderWindow& window)
+    : window{window}
 {}
-GameStateContext::~GameStateContext() {
+GameStateMachine::~GameStateMachine() {
     delete currentState;
 }
-void GameStateContext::handleMousePositionUpdate(const sf::Vector2f& mouseWorldPos) {
+
+GameStateMachine* GameStateMachine::context = nullptr;
+
+void GameStateMachine::initializeStateMachine(sf::RenderWindow& window) {
+    context = new GameStateMachine(window);
+    context->currentState = new MainMenuState();
+}
+GameStateMachine& GameStateMachine::getContext() {
+    if (!context) {
+        std::cerr << "Erreur : la machine à états n'est pas initialisé !" << std::endl;
+        std::terminate();
+    }
+    return *context;
+}
+
+void GameStateMachine::tick()
+{
+    sf::Vector2i mousePos{sf::Mouse::getPosition(window)};
+    sf::Vector2f mouseWorldPos{window.mapPixelToCoords(mousePos)};
     currentState = currentState->onMousePositionUpdate(mouseWorldPos);
+
+    // la gestion des événements
+    sf::Event event;
+    while (window.pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed
+            || (event.type == sf::Event::KeyPressed
+                && event.key.code == sf::Keyboard::Escape))
+        {
+            window.close();
+        }
+
+        if (event.type == sf::Event::MouseButtonPressed
+            && event.mouseButton.button == sf::Mouse::Left)
+        {
+            currentState = currentState->onMouseClick();
+        }
+
+        if (event.type == sf::Event::MouseButtonReleased
+            && event.mouseButton.button == sf::Mouse::Left)
+        {
+            currentState = currentState->onMouseRelease();
+        }
+    }
+
+    // l'affichage
+    window.clear();
+    window.setView(window.getDefaultView());
+    currentState->render(window);
+    window.display();
 }
-void GameStateContext::handleMouseClick() {
-    currentState = currentState->onMouseClick();
-}
-void GameStateContext::handleMouseRelease() {
-    currentState = currentState->onMouseRelease();
-}
+
 GameState* GameState::onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) { return this; }
 GameState* GameState::onMouseClick() { return this; }
 GameState* GameState::onMouseRelease() { return this; }
+void GameState::render(sf::RenderWindow& window) const {}
 
-// StateMainMenu()
-
+MainMenuState::MainMenuState()
+    : buttons{
+        new ButtonHello{{20.f, 20.f}}
+    }
+{}
+MainMenuState::~MainMenuState() {
+    for (Button* button : buttons) {
+        delete button;
+    }
+}
+GameState* MainMenuState::onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) {
+    // on veut un std::reverse_iterator, car les derniers boutons affichés se trouvent au dessus
+    for (auto it = buttons.rbegin(); it != buttons.rend(); ++it) {
+        if ((*it)->contains(mouseWorldPos)) {
+            (*it)->onMouseHover();
+        }
+    }
+    return this;
+}
+GameState* MainMenuState::onMouseClick() { return this; }
+GameState* MainMenuState::onMouseRelease() {
+    return new LevelStateIdle{
+        LevelManager::getInstance().loadLevel(GameStateMachine::getContext().window, 1),
+        {-1, -1}
+    };
+}
+void MainMenuState::render(sf::RenderWindow& window) const {
+    for (Button* button : buttons) {
+        window.draw(*button);
+    }
+}
 
 LevelState::LevelState(Level* level, const sf::Vector2i& currentGridPos)
     : GameState{}
@@ -43,6 +118,9 @@ GameState* LevelState::onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) 
         currentGridPos.x = -1;
     }
     return this;
+}
+void LevelState::render(sf::RenderWindow& window) const {
+    window.draw(*level);
 }
 
 

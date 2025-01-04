@@ -3,6 +3,8 @@
 #include "DrawableShape.hpp"
 #include <SFML/Graphics.hpp>
 
+class GameState;
+
 class Button : public DrawableShape
 {
 private:
@@ -20,7 +22,7 @@ protected:
            const sf::Color& buttonTextColor, const sf::Color& buttonTextColorOnHover);
 public:
     bool contains(const sf::Vector2f& worldPos) const;
-    virtual void onMouseClick() = 0;
+    virtual GameState* onMouseClick() = 0;
     virtual void onMouseHover();
     virtual void onMouseLeave();
     void update();
@@ -33,7 +35,7 @@ class ButtonHello : public Button
 {
 public:
     ButtonHello(const sf::Vector2f& worldPosTopLeft);
-    void onMouseClick() override;
+    GameState* onMouseClick() override;
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "Button.hpp"
+#include "GameStateMachine.hpp"
 #include "ResourceManager.hpp"
 #include <string>
 
@@ -17,7 +18,7 @@ Button::Button(const sf::Vector2f& worldPosTopLeft, float width, float height,
     }
     , buttonColor{buttonColor}
     , buttonColorOnHover{buttonColorOnHover}
-    , buttonText{buttonTextRaw, buttonTextFont, 30U}
+    , buttonText{buttonTextRaw, buttonTextFont, buttonTextSize}
     , buttonTextColor{buttonTextColor}
     , buttonTextColorOnHover{buttonTextColorOnHover}
     , mouseOver{false}
@@ -66,11 +67,12 @@ void Button::acceptTransform(const sf::Transform& transform) {
 
 ButtonHello::ButtonHello(const sf::Vector2f& worldPosTopLeft)
     : Button{
-        worldPosTopLeft, 200.f, 50.f,
+        worldPosTopLeft, 1000.f, 300.f,
         sf::Color(0x0000FFFF), sf::Color(0x00FF00FF),
-        L"Hello World", ResourceManager::getInstance().getTextFont(), 30U,
+        L"Clique sur moi !", ResourceManager::getInstance().getTextFont(), 96U,
         sf::Color::Yellow, sf::Color::White
     }
 {}
-void ButtonHello::onMouseClick() {
+GameState* ButtonHello::onMouseClick() {
+    return nullptr;
 }

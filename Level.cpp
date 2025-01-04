@@ -26,9 +26,10 @@ void LevelData::setCurrent(const sf::Vector2i& gridPos, int value)
     gridCurrent[gridPos.y * nCol + gridPos.x] = value;
 }
 
-Level::Level(const LevelData &levelData, const sf::Vector2f& centerCoords, float gridSizeInPixels)
+Level::Level(const LevelData& levelData, const sf::Vector2f& centerCoords, float gridSizeInPixels)
     : LevelData{levelData}
     , DrawableShape{{}, sf::Triangles}
+    , originalData{levelData}
     , pieces{}
     , operators{}
     , inAnimation{false}
@@ -60,6 +61,11 @@ Level::Level(const LevelData &levelData, const sf::Vector2f& centerCoords, float
     vertexArray.emplace_back(sf::Vertex{{x1, y1}, PieceColor::WALL.backgroundColor});
 
     // lecture des données des cases du niveau
+    initializePiecesAndOperators();
+}
+
+void Level::initializePiecesAndOperators()
+{
 	for (int pieceIdx = 0; pieceIdx < static_cast<int>(colors.size()); ++pieceIdx) {
 		pieces.emplace_back(Piece{{{}, colors[pieceIdx]}, *this, pieceIdx});
 	}
@@ -80,14 +86,9 @@ Level::Level(const LevelData &levelData, const sf::Vector2f& centerCoords, float
                 pieces[pieceIdx].setHasCorrectPosition();
 				break;
 			}
-			int startingCellData = gridCurrent[cellIdx];
-			if (startingCellData >= 2) {
-			    int pieceIdx = startingCellData - 2;
-				// if (pieceIdx < static_cast<int>(pieces.size())) {
-				    pieces[pieceIdx].emplaceCell({x, y});
-                // } else {
-                //     std::cout << pieceIdx << std::endl;
-                // }
+			int pieceIdx = gridCurrent[cellIdx] - 2;
+			if (pieceIdx >= 0) {
+                pieces[pieceIdx].emplaceCell({x, y});
 			}
 			++cellIdx;
 		}
@@ -106,6 +107,13 @@ Level::Level(const LevelData &levelData, const sf::Vector2f& centerCoords, float
     {
         piece.update();
     }
+}
+
+void Level::restart()
+{
+    gridCurrent = originalData.gridCurrent;
+    dataOfOperators = originalData.dataOfOperators;
+    initializePiecesAndOperators();
 }
 
 // bool Level::isInAnimation() const

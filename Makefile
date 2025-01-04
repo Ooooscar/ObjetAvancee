@@ -52,7 +52,7 @@ all: Main
 # $^ : Référence à tous les fils d'une règle
 Piece: Piece.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
-Main: Main.o Button.o ResourceManager.o Renderer.o LevelEventHandler.o Level.o Piece.o DrawableShape.o Operator.o
+Main: Main.o Button.o ResourceManager.o GameStateMachine.o LevelManager.o Level.o Piece.o DrawableShape.o Operator.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 

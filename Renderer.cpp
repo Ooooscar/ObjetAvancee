@@ -1,16 +1,13 @@
 #include "Renderer.hpp"
 #include "Button.hpp"
-#include "LevelEventHandler.hpp"
+#include "GameStateMachine.hpp"
 #include "ResourceManager.hpp"
+#include "LevelManager.hpp"
 
-Renderer::Renderer(const std::vector<LevelData>& levels)
-    : levels{levels}
-    , window{ { static_cast<unsigned int>(sf::VideoMode::getDesktopMode().width / 3) * 2,
+Renderer::Renderer()
+    : window{ { static_cast<unsigned int>(sf::VideoMode::getDesktopMode().width / 3) * 2,
 			    static_cast<unsigned int>(sf::VideoMode::getDesktopMode().height / 3) * 2 },
 			  "Piece Out" }
-    , centerCoords{window.mapPixelToCoords(sf::Vector2i{window.getSize()}) / 2.0f}
-	, gridSizeInPixels{std::min(centerCoords.x, centerCoords.y) / 6.0f}
-    , currentLevel{new Level{levels[0], centerCoords, gridSizeInPixels}}
 {
 	window.setFramerateLimit(30);
 }
@@ -19,7 +16,8 @@ void Renderer::run()
 {
     // std::wstring message{L"Piece Out Niveau " + std::to_wstring(indexCurrentLevel + 1)};
 
-    GameStateContext context{currentLevel};
+    Level* currentLevel{LevelManager::getInstance().loadLevel(window, 1)};
+    GameStateMachine context{currentLevel};
 
     ButtonHello hello{{20.f, 20.f}};
 

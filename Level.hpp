@@ -16,6 +16,7 @@ protected:
     std::vector<int> gridCurrent;
     std::vector<OperatorData> dataOfOperators;
     std::vector<PieceColor> colors;
+    friend class Level;
 public:
     LevelData( const int nCol, const int nRow,
             std::vector<int>&& gridFinal, std::vector<int>&& gridCurrent,
@@ -29,6 +30,7 @@ public:
 class Level : public LevelData, public DrawableShape
 {
 private:
+    const LevelData& originalData;
 public:
     std::vector<Piece> pieces;
 private:
@@ -40,6 +42,7 @@ private:
     float gridSizeInPixels;
 public:
     Level(const LevelData& levelData, const sf::Vector2f& centerCoords, float gridSize);
+    void restart();
 
     bool contains(const sf::Vector2f& worldPos) const;
     const sf::Vector2f& getCenterCoords() const;
@@ -52,6 +55,7 @@ public:
     void addSquareTo(std::vector<sf::Vertex>& vertexArray, const sf::Vector2i& topLeftGridPos, const sf::Color& color = {});
 
 private:
+    void initializePiecesAndOperators();
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
 
