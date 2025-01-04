@@ -22,59 +22,12 @@ int main()
 }
 
 
-
-	// 	sf::Vector2i mousePos{sf::Mouse::getPosition(window)};
-    //     context.handleMousePositionUpdate(window.mapPixelToCoords(mousePos));
-
-    //     // la gestion des événements
-	// 	sf::Event event;
-	// 	while (window.pollEvent(event))
-	// 	{
-	// 		if (event.type == sf::Event::Closed
-	// 			|| (event.type == sf::Event::KeyPressed
-    //                 && event.key.code == sf::Keyboard::Escape))
-	// 		{
-	// 			window.close();
-	// 		}
-
-    //         if (event.type == sf::Event::MouseButtonPressed
-    //             && event.mouseButton.button == sf::Mouse::Left)
-    //         {
-    //             context.handleMouseClick();
-    //         }
-
-    //         if (event.type == sf::Event::MouseButtonReleased
-    //             && event.mouseButton.button == sf::Mouse::Left)
-    //         {
-    //             context.handleMouseRelease();
-    //         }
-    //     }
-
-    //     window.clear();
-    //     window.setView(window.getDefaultView());
-
     //     // if (currentLevel.isInAnimation()) {
     //         // currentLevel.update();
     //         // if (!currentLevel.isOnAnimation() && currentLevel.isFinished()) {
     //         //     message = L"Vous avez gagné !";
     //         // }
     //     // }
-
-    //     // les affichages  
-    //     window.draw(*currentLevel);
-
-    //     window.draw(hello);
-    //     // TODO
-    //     // sf::Text text{message, ResourceManager::getInstance().getTextFont()};
-    //     // text.setFillColor(sf::Color::Yellow);
-    //     // text.setCharacterSize(100); // en pixels
-    //     // window.draw(text);
-
-
-    //     // sf::RectangleShape rect{sf::Vector2f{150,150}};
-    //     // rect.setPosition(1000, 0);
-    //     // rect.setFillColor(sf::Color::Blue);
-    //     // fenetre.draw(rect);
 
     //     // sf::Glyph glyph = symbolsFont.getGlyph(L'\x2B6E', 150, false);
     //     // const sf::Texture& texture = symbolsFont.getTexture(150);
@@ -90,5 +43,3 @@ int main()
     //     // {
     //     //     std::cout << "Glyph not available in the font!" << std::endl;
     //     // }
-
-    //     window.display();

@@ -112,7 +112,6 @@ MainMenuStateButtonHover::MainMenuStateButtonHover(const std::vector<Button*>* b
 {}
 GameState* MainMenuStateButtonHover::onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) {
     if (currentButton->contains(mouseWorldPos)) {
-        currentButton->onMouseEnter();
         return this;
     }
     currentButton->onMouseLeave();
@@ -128,14 +127,12 @@ MainMenuStateButtonClicked::MainMenuStateButtonClicked(const std::vector<Button*
     , currentButton{currentButton}
 {}
 GameState* MainMenuStateButtonClicked::onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) {
-    if (currentButton) {
-        if (currentButton->contains(mouseWorldPos)){
-            return this;
-        }
-        currentButton->onMouseLeave();
-        currentButton = nullptr;
+    if (currentButton->contains(mouseWorldPos)){
+        return this;
     }
-    return this;
+    currentButton->onMouseLeave();
+    GameState* newState{MainMenuState::onMousePositionUpdate(mouseWorldPos)};
+    return (newState == this) ? new MainMenuState(buttons) : newState;
 }
 GameState* MainMenuStateButtonClicked::onMouseRelease() {
     return (currentButton) ? currentButton->activate() : new MainMenuState(buttons);

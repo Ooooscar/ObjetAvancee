@@ -4,6 +4,10 @@ DrawableShape::DrawableShape(const std::vector<sf::Vertex>& vertexArray, sf::Pri
     : vertexArray{vertexArray}
     , primitiveType{primitiveType}
 {}
+DrawableShape::DrawableShape(std::vector<sf::Vertex>&& vertexArray, sf::PrimitiveType primitiveType)
+    : vertexArray{std::move(vertexArray)}
+    , primitiveType{primitiveType}
+{}
 
 void DrawableShape::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {

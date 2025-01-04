@@ -24,11 +24,10 @@ protected:
     );
 public:
     bool contains(const sf::Vector2f& worldPos) const;
-    virtual void onMouseLeave();
     virtual void onMouseEnter();
+    virtual void onMouseLeave();
     virtual void onMouseDown();
     virtual GameState* activate() = 0;
-    void updateColor();
     void updateTextPosition();
 protected:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
