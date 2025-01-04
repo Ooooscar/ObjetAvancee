@@ -45,14 +45,35 @@ public:
 class MainMenuState : public GameState
 {
 protected:
-    std::vector<Button*> buttons;
+    const std::vector<Button*>* buttons;
+    Button* getButtonAt(const sf::Vector2f& worldPos) const;
 public:
     MainMenuState();
-    ~MainMenuState();
+    MainMenuState(const std::vector<Button*>* buttons);
+    virtual ~MainMenuState();
+
+    GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
+    void render(sf::RenderWindow& window) const override;
+};
+
+class MainMenuStateButtonHover: public MainMenuState
+{
+protected:
+    Button* currentButton;
+public:
+    MainMenuStateButtonHover(const std::vector<Button*>* buttons, Button* currentButton);
     GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
     GameState* onMouseClick() override;
+};
+
+class MainMenuStateButtonClicked : public MainMenuState
+{
+protected:
+    Button* currentButton;
+public:
+    MainMenuStateButtonClicked(const std::vector<Button*>* buttons, Button* currentButton);
+    GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
     GameState* onMouseRelease() override;
-    void render(sf::RenderWindow& window) const override;
 };
 
 class LevelState : public GameState
@@ -77,18 +98,18 @@ public:
     GameState* onMouseClick() override;
 };
 
-class LevelStatePieceSelected : public LevelState
+class LevelStatePieceClicked : public LevelState
 {
 protected:
     int selectedPieceIdx;
     sf::Vector2i lastGridPos;
 public:
-    LevelStatePieceSelected(Level* level, int selectedPieceIdx, const sf::Vector2i& currentGridPos);
+    LevelStatePieceClicked(Level* level, int selectedPieceIdx, const sf::Vector2i& currentGridPos);
     GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
     GameState* onMouseRelease() override;
 };
 
-class LevelStatePieceSliding : public LevelStatePieceSelected
+class LevelStatePieceSliding : public LevelStatePieceClicked
 {
 protected:
     Direction* direction;

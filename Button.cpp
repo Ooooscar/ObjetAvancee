@@ -1,12 +1,16 @@
 #include "Button.hpp"
 #include "GameStateMachine.hpp"
+#include "LevelManager.hpp"
 #include "ResourceManager.hpp"
-#include <string>
+
+sf::Color Button::buttonTextColor{0xFFFFFCFF};
 
 Button::Button(const sf::Vector2f& topLeftWorldPos, float width, float height,
-           const sf::Color& buttonColor, const sf::Color& buttonColorOnHover,
-           const sf::String& buttonTextRaw, sf::Font& buttonTextFont, unsigned int buttonTextSize,
-           const sf::Color& buttonTextColor, const sf::Color& buttonTextColorOnHover)
+            const sf::String& buttonTextRaw, sf::Font& buttonTextFont, unsigned int buttonTextSize,
+            const sf::Color& buttonColor = sf::Color{0x333333FF},
+            const sf::Color& buttonColorOnHover = sf::Color{0x444444FF},
+            const sf::Color& buttonColorOnClick = sf::Color{0x555555FF}
+        )
     : DrawableShape{
         std::vector<sf::Vertex>{
             {topLeftWorldPos},
@@ -18,13 +22,11 @@ Button::Button(const sf::Vector2f& topLeftWorldPos, float width, float height,
     }
     , buttonColor{buttonColor}
     , buttonColorOnHover{buttonColorOnHover}
+    , buttonColorOnClick{buttonColorOnClick}
     , buttonText{buttonTextRaw, buttonTextFont, buttonTextSize}
-    , buttonTextColor{buttonTextColor}
-    , buttonTextColorOnHover{buttonTextColorOnHover}
     , mouseOver{false}
 {
-    updateTextPosition();
-    updateColor();
+    onMouseLeave();
 }
 
 bool Button::contains(const sf::Vector2f& worldPos) const {
@@ -33,25 +35,39 @@ bool Button::contains(const sf::Vector2f& worldPos) const {
         && vertexArray[1].position.x >= worldPos.x
         && vertexArray[2].position.y >= worldPos.y;
 }
-void Button::onMouseHover() {
-    mouseOver = true;
-    updateColor();
-}
+
 void Button::onMouseLeave() {
     mouseOver = false;
+    buttonText.setStyle(sf::Text::Regular);
+    updateTextPosition();
+    for (sf::Vertex& vertex : vertexArray) {
+        vertex.color = buttonColor;
+    }
+}
+void Button::onMouseEnter() {
+    mouseOver = true;
+    buttonText.setStyle(sf::Text::Bold);
+    updateTextPosition();
+    for (sf::Vertex& vertex : vertexArray) {
+        vertex.color = buttonColorOnHover;
+    }
+}
+void Button::onMouseDown() {
+    mouseOver = true;
     updateColor();
+    for (sf::Vertex& vertex : vertexArray) {
+        vertex.color = buttonColorOnClick;
+    }
 }
 void Button::updateColor() {
     if (mouseOver) {
         for (sf::Vertex& vertex : vertexArray) {
             vertex.color = buttonColorOnHover;
         }
-        buttonText.setFillColor(buttonTextColorOnHover);
     } else {
         for (sf::Vertex& vertex : vertexArray) {
             vertex.color = buttonColor;
         }
-        buttonText.setFillColor(buttonTextColor);
     }
 }
 void Button::updateTextPosition() {
@@ -76,11 +92,12 @@ void Button::acceptTransform(const sf::Transform& transform) {
 ButtonHello::ButtonHello(const sf::Vector2f& topLeftWorldPos)
     : Button{
         topLeftWorldPos, 1000.f, 300.f,
-        sf::Color(0x0000FFFF), sf::Color(0x00FF00FF),
-        L"Je veux jouer !", ResourceManager::getInstance().getTextFont(), 96U,
-        sf::Color::Yellow, sf::Color::White
+        L"Je veux jouer !", ResourceManager::getInstance().getTextFont(), 96U
     }
 {}
-GameState* ButtonHello::onMouseClick() {
-    return nullptr;
+GameState* ButtonHello::activate() {
+    return new LevelStateIdle{
+        LevelManager::getInstance().loadLevel(GameStateMachine::getContext().window, 1),
+        {-1, -1}
+    };
 }

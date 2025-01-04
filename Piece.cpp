@@ -6,7 +6,7 @@
 PieceColor::PieceColor(const sf::Color &primaryColor, const sf::Color &backgroundColor)
     : primaryColor{primaryColor}, backgroundColor{backgroundColor}
 {}
-const PieceColor PieceColor::WALL  {sf::Color{0x3F3F3FFF}, sf::Color{0xFFFFFCFF}};
+const PieceColor PieceColor::WALL  {sf::Color{0x333333FF}, sf::Color{0xFFFFFCFF}};
 const PieceColor PieceColor::RED   {sf::Color{0xFD4030FF}, sf::Color{0xFEB0A9FF}};
 const PieceColor PieceColor::ORANGE{sf::Color{0xFFAA00FF}, sf::Color{0xFFE1A8FF}};
 const PieceColor PieceColor::GREEN {sf::Color{0x7AE300FF}, sf::Color{0xDBFFB3FF}};

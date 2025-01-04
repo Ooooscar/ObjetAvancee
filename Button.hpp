@@ -10,21 +10,24 @@ class Button : public DrawableShape
 private:
     sf::Color buttonColor;
     sf::Color buttonColorOnHover;
+    sf::Color buttonColorOnClick;
     sf::Text buttonText;
     sf::Transform buttonTextTransform;
-    sf::Color buttonTextColor;
-    sf::Color buttonTextColorOnHover;
+    static sf::Color buttonTextColor;
     bool mouseOver;
 protected:
     Button(const sf::Vector2f& topLeftWorldPos, float width, float height,
-           const sf::Color& buttonColor, const sf::Color& buttonColorOnHover,
-           const sf::String& buttonTextRaw, sf::Font& buttonTextFont, unsigned int buttonTextSize,
-           const sf::Color& buttonTextColor, const sf::Color& buttonTextColorOnHover);
+        const sf::String& buttonTextRaw, sf::Font& buttonTextFont, unsigned int buttonTextSize,
+        const sf::Color& buttonColor,
+        const sf::Color& buttonColorOnHover,
+        const sf::Color& buttonColorOnClick
+    );
 public:
     bool contains(const sf::Vector2f& worldPos) const;
-    virtual GameState* onMouseClick() = 0;
-    virtual void onMouseHover();
     virtual void onMouseLeave();
+    virtual void onMouseEnter();
+    virtual void onMouseDown();
+    virtual GameState* activate() = 0;
     void updateColor();
     void updateTextPosition();
 protected:
@@ -36,7 +39,7 @@ class ButtonHello : public Button
 {
 public:
     ButtonHello(const sf::Vector2f& topLeftWorldPos);
-    GameState* onMouseClick() override;
+    GameState* activate() override;
 };
 
 #endif

@@ -1,4 +1,3 @@
-// #include "Renderer.hpp"
 #include "GameStateMachine.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -15,10 +14,12 @@ int main()
 	GameStateMachine::initializeStateMachine(window);
 	GameStateMachine& context{GameStateMachine::getContext()};
 
-    // ButtonHello hello{{20.f, 20.f}};
-
 	while (window.isOpen()) {
 		context.tick();
+    }
+
+    return EXIT_SUCCESS;
+}
 
 
 
@@ -91,8 +92,3 @@ int main()
     //     // }
 
     //     window.display();
-    
-    }
-
-    return EXIT_SUCCESS;
-}

@@ -68,34 +68,77 @@ void GameState::render(sf::RenderWindow& window) const {}
 
 MainMenuState::MainMenuState()
     : buttons{
-        new ButtonHello{{20.f, 20.f}}
+        new std::vector<Button*>{
+            new ButtonHello{{20.f, 20.f}}
+        }
     }
 {}
+MainMenuState::MainMenuState(const std::vector<Button*>* buttons)
+    : buttons{buttons}
+{}
 MainMenuState::~MainMenuState() {
-    for (Button* button : buttons) {
+    for (Button* button : *buttons) {
         delete button;
     }
+    delete buttons;
+}
+
+Button* MainMenuState::getButtonAt(const sf::Vector2f& worldPos) const {
+    // on veut un std::reverse_iterator, car les derniers boutons affichés se trouvent au dessus
+    for (auto it = buttons->rbegin(); it != buttons->rend(); ++it) {
+        if ((*it)->contains(worldPos)) {
+            return *it;
+        }
+    }
+    return nullptr;
 }
 GameState* MainMenuState::onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) {
-    // on veut un std::reverse_iterator, car les derniers boutons affichés se trouvent au dessus
-    for (auto it = buttons.rbegin(); it != buttons.rend(); ++it) {
-        if ((*it)->contains(mouseWorldPos)) {
-            (*it)->onMouseHover();
-        }
+    Button* button = getButtonAt(mouseWorldPos);
+    if (button) {
+        button->onMouseEnter();
+        return new MainMenuStateButtonHover(buttons, button);
     }
     return this;
 }
-GameState* MainMenuState::onMouseClick() { return this; }
-GameState* MainMenuState::onMouseRelease() {
-    return new LevelStateIdle{
-        LevelManager::getInstance().loadLevel(GameStateMachine::getContext().window, 1),
-        {-1, -1}
-    };
-}
 void MainMenuState::render(sf::RenderWindow& window) const {
-    for (Button* button : buttons) {
+    for (Button* button : *buttons) {
         window.draw(*button);
     }
+}
+
+MainMenuStateButtonHover::MainMenuStateButtonHover(const std::vector<Button*>* buttons, Button* currentButton)
+    : MainMenuState{buttons}
+    , currentButton{currentButton}
+{}
+GameState* MainMenuStateButtonHover::onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) {
+    if (currentButton->contains(mouseWorldPos)) {
+        currentButton->onMouseEnter();
+        return this;
+    }
+    currentButton->onMouseLeave();
+    GameState* newState{MainMenuState::onMousePositionUpdate(mouseWorldPos)};
+    return (newState == this) ? new MainMenuState(buttons) : newState;
+}
+GameState* MainMenuStateButtonHover::onMouseClick() {
+    currentButton->onMouseDown();
+    return new MainMenuStateButtonClicked{buttons, currentButton};
+}
+MainMenuStateButtonClicked::MainMenuStateButtonClicked(const std::vector<Button*>* buttons, Button* currentButton)
+    : MainMenuState{buttons}
+    , currentButton{currentButton}
+{}
+GameState* MainMenuStateButtonClicked::onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) {
+    if (currentButton) {
+        if (currentButton->contains(mouseWorldPos)){
+            return this;
+        }
+        currentButton->onMouseLeave();
+        currentButton = nullptr;
+    }
+    return this;
+}
+GameState* MainMenuStateButtonClicked::onMouseRelease() {
+    return (currentButton) ? currentButton->activate() : new MainMenuState(buttons);
 }
 
 LevelState::LevelState(Level* level, const sf::Vector2i& currentGridPos)
@@ -132,17 +175,17 @@ GameState* LevelStateIdle::onMouseClick() {
         int selectedPieceIdx = level->getCurrent(currentGridPos) - 2;
         std::cout << "Clicked on Piece " << selectedPieceIdx << std::endl;
         if (selectedPieceIdx >= 0) {
-            return new LevelStatePieceSelected(level, selectedPieceIdx, currentGridPos);
+            return new LevelStatePieceClicked(level, selectedPieceIdx, currentGridPos);
         }
     }
     return this;
 }
 
-LevelStatePieceSelected::LevelStatePieceSelected(Level* level, int selectedPieceIdx, const sf::Vector2i& currentGridPos)
+LevelStatePieceClicked::LevelStatePieceClicked(Level* level, int selectedPieceIdx, const sf::Vector2i& currentGridPos)
     : LevelState{level, currentGridPos}
     , selectedPieceIdx{selectedPieceIdx}
 {}
-GameState* LevelStatePieceSelected::onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) {
+GameState* LevelStatePieceClicked::onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) {
     lastGridPos = currentGridPos;
     LevelState::onMousePositionUpdate(mouseWorldPos);
     if (!levelContainsCurrentPos()) {
@@ -174,13 +217,13 @@ GameState* LevelStatePieceSelected::onMousePositionUpdate(const sf::Vector2f& mo
         return this;
     }
 }
-GameState* LevelStatePieceSelected::onMouseRelease() {
+GameState* LevelStatePieceClicked::onMouseRelease() {
     level->pieces[selectedPieceIdx].onMouseActivate(currentGridPos);
     return new LevelStateIdle{level, currentGridPos};
 }
 
 LevelStatePieceSliding::LevelStatePieceSliding(Level* level, int selectedPieceIdx, Direction* direction, const sf::Vector2i& currentGridPos, const sf::Vector2i& startingGridPos)
-    : LevelStatePieceSelected{level, selectedPieceIdx, currentGridPos}
+    : LevelStatePieceClicked{level, selectedPieceIdx, currentGridPos}
     , direction{direction}
     , startingGridPos{startingGridPos}
 {}
@@ -189,7 +232,7 @@ LevelStatePieceSliding::~LevelStatePieceSliding() {
 }
 GameState* LevelStatePieceSliding::onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) {
     if (!direction) {
-        return LevelStatePieceSelected::onMousePositionUpdate(mouseWorldPos);
+        return LevelStatePieceClicked::onMousePositionUpdate(mouseWorldPos);
     }
     lastGridPos = currentGridPos;
     LevelState::onMousePositionUpdate(mouseWorldPos);
