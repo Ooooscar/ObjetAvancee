@@ -69,7 +69,7 @@ ButtonHello::ButtonHello(const sf::Vector2f& worldPosTopLeft)
     : Button{
         worldPosTopLeft, 1000.f, 300.f,
         sf::Color(0x0000FFFF), sf::Color(0x00FF00FF),
-        L"Clique sur moi !", ResourceManager::getInstance().getTextFont(), 96U,
+        L"Je veux jouer !", ResourceManager::getInstance().getTextFont(), 96U,
         sf::Color::Yellow, sf::Color::White
     }
 {}
