@@ -16,7 +16,7 @@ private:
     sf::Color buttonTextColorOnHover;
     bool mouseOver;
 protected:
-    Button(const sf::Vector2f& worldPosTopLeft, float width, float height,
+    Button(const sf::Vector2f& topLeftWorldPos, float width, float height,
            const sf::Color& buttonColor, const sf::Color& buttonColorOnHover,
            const sf::String& buttonTextRaw, sf::Font& buttonTextFont, unsigned int buttonTextSize,
            const sf::Color& buttonTextColor, const sf::Color& buttonTextColorOnHover);
@@ -25,8 +25,9 @@ public:
     virtual GameState* onMouseClick() = 0;
     virtual void onMouseHover();
     virtual void onMouseLeave();
-    void update();
-private:
+    void updateColor();
+    void updateTextPosition();
+protected:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
     void acceptTransform(const sf::Transform& transform) override;
 };
@@ -34,7 +35,7 @@ private:
 class ButtonHello : public Button
 {
 public:
-    ButtonHello(const sf::Vector2f& worldPosTopLeft);
+    ButtonHello(const sf::Vector2f& topLeftWorldPos);
     GameState* onMouseClick() override;
 };
 
