@@ -38,26 +38,13 @@ private:
 
     sf::Vector2f centerCoords;
     float gridSizeInPixels;
-
-    Piece* movingPiece;
-
-    // friend class LevelEventHandler;
 public:
     Level(const LevelData& levelData, const sf::Vector2f& centerCoords, float gridSize);
-
-    // les operateurs du niveau seront supprimés par le déstructeur des pièces
-    virtual ~Level() = default;
-    Level(const Level&) = delete;
-    Level& operator=(const Level&) = delete;
-    Level(Level&&) = delete;
-    Level& operator=(Level&&) = delete;
-
-    const Operator& getOperatorAt(int operatorIdx) const;
 
     bool contains(const sf::Vector2f& worldPos) const;
     const sf::Vector2f& getCenterCoords() const;
     float getGridSizeInPixels() const;
-    bool isInAnimation() const;
+    // bool isInAnimation() const;
 
     sf::Vector2f mapPixelToGrid(const sf::Vector2f& worldPos) const;
     sf::Vector2f mapGridToPixel(const sf::Vector2i& gridPos) const;

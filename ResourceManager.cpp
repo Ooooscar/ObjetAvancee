@@ -11,7 +11,7 @@ ResourceManager& ResourceManager::getInstance() {
     return instance;
 }
 
-const sf::Font& ResourceManager::getTextFont() {
+sf::Font& ResourceManager::getTextFont() {
     if (!textFont) {
         textFont = new sf::Font();
     }
@@ -21,7 +21,7 @@ const sf::Font& ResourceManager::getTextFont() {
     }
     return *textFont;
 }
-const sf::Font& ResourceManager::getSymbolsFont() {
+sf::Font& ResourceManager::getSymbolsFont() {
     if (!symbolsFont) {
         symbolsFont = new sf::Font();
     }

@@ -13,13 +13,10 @@ private:
 
 	sf::Font* textFont;
 	sf::Font* symbolsFont;
-
-    void loadTextFont();
-    void loadSymbolsFont();
 public:
     static ResourceManager& getInstance();
-    const sf::Font& getTextFont();
-    const sf::Font& getSymbolsFont();
+    sf::Font& getTextFont();
+    sf::Font& getSymbolsFont();
 };
 
 #endif

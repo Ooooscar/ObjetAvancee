@@ -19,39 +19,6 @@ PieceData::PieceData(const std::vector<sf::Vector2i> &gridCoords, const PieceCol
     , color{color}
 {}
 
-// PieceData::~PieceData()
-// {
-//     for (sf::Vector2f* vPtr : gridPosMoveOps)
-//         delete vPtr;
-// }
-
-// PieceData::PieceData(const PieceData& other)
-//     : gridCoords{other.gridCoords}
-//     , color{other.color}
-//     , gridPosMoveOps{
-//         [&]{
-//             std::vector<sf::Vector2f*> tmp{};
-//             tmp.reserve(other.gridPosMoveOps.size());
-//             for (sf::Vector2f* vPtr : other.gridPosMoveOps)
-//                 tmp.emplace_back(vPtr ? new sf::Vector2f{*vPtr} : nullptr);
-//             return tmp;
-//         }()
-//     }
-// {
-// }
-
-// PieceData& PieceData::operator=(const PieceData& other)
-// {
-//     if (this == &other)
-//         return *this;
-//     PieceData temp{other};
-//     gridCoords = std::move(temp.gridCoords);
-//     color = std::move(temp.color);
-//     for (size_t i = 0; i < gridPosMoveOps.size(); ++i)
-//         std::swap(gridPosMoveOps[i], temp.gridPosMoveOps[i]);
-//     return *this;
-// }
-
 void PieceData::emplaceCell(const sf::Vector2i& gridPos)
 {
     gridCoords.emplace_back(gridPos);
@@ -108,64 +75,64 @@ bool Piece::addOperator(Operator& op)
     }
 }
 
-void Piece::transformWorldCoords(const sf::Transform& transform)
-{
-    if (!vertexArrayOld.size())
-        vertexArrayOld = vertexArray;
-    std::vector<sf::Vertex>::iterator it0{vertexArrayOld.begin()};
-    std::vector<sf::Vertex>::iterator it1{vertexArray.begin()};
-    for (; (it0 != vertexArrayOld.end()) && (it1 != vertexArray.end()); (++it0, ++it1))
-        it1->position = transform.transformPoint(it0->position.x, it0->position.y);
-}
+// void Piece::transformWorldCoords(const sf::Transform& transform)
+// {
+//     if (!vertexArrayOld.size())
+//         vertexArrayOld = vertexArray;
+//     std::vector<sf::Vertex>::iterator it0{vertexArrayOld.begin()};
+//     std::vector<sf::Vertex>::iterator it1{vertexArray.begin()};
+//     for (; (it0 != vertexArrayOld.end()) && (it1 != vertexArray.end()); (++it0, ++it1))
+//         it1->position = transform.transformPoint(it0->position.x, it0->position.y);
+// }
 
-void Piece::move(int direction, float progress)
-{
-    float offsetInPixels = progress * level.getGridSizeInPixels();
+// void Piece::move(int direction, float progress)
+// {
+//     float offsetInPixels = progress * level.getGridSizeInPixels();
 
-    switch (direction)
-    {
-    case 2 : // ouest
-        offsetInPixels = -offsetInPixels;
-    case 0 : // est
-        transformWorldCoords({ 0.0f, 0.0f, offsetInPixels,
-                               0.0f, 0.0f, 0.0f,
-                               0.0f, 0.0f, 1.0f });
-        break;
-    case 3 : // nord
-        offsetInPixels = -offsetInPixels;
-    case 1 : // sud
-        transformWorldCoords({ 0.0f, 0.0f, 0.0f,
-                               0.0f, 0.0f, offsetInPixels,
-                               0.0f, 0.0f, 1.0f });
-        break;
-    }
-}
+//     switch (direction)
+//     {
+//     case 2 : // ouest
+//         offsetInPixels = -offsetInPixels;
+//     case 0 : // est
+//         transformWorldCoords({ 0.0f, 0.0f, offsetInPixels,
+//                                0.0f, 0.0f, 0.0f,
+//                                0.0f, 0.0f, 1.0f });
+//         break;
+//     case 3 : // nord
+//         offsetInPixels = -offsetInPixels;
+//     case 1 : // sud
+//         transformWorldCoords({ 0.0f, 0.0f, 0.0f,
+//                                0.0f, 0.0f, offsetInPixels,
+//                                0.0f, 0.0f, 1.0f });
+//         break;
+//     }
+// }
 
-void Piece::rotate(const sf::Vector2f& originWorldPos, float angleInRad)
-{
-    float cosine = std::cos(angleInRad);
-    float sine = std::sin(angleInRad);
-    float x = originWorldPos.x;
-    float y = originWorldPos.y;
-    transformWorldCoords({ cosine, -sine, - x*cosine + y*sine + x,
-                           sine,  cosine, - x*sine - y*cosine + y,
-                           0.0f, 0.0f, 1.0f });
-}
+// void Piece::rotate(const sf::Vector2f& originWorldPos, float angleInRad)
+// {
+//     float cosine = std::cos(angleInRad);
+//     float sine = std::sin(angleInRad);
+//     float x = originWorldPos.x;
+//     float y = originWorldPos.y;
+//     transformWorldCoords({ cosine, -sine, - x*cosine + y*sine + x,
+//                            sine,  cosine, - x*sine - y*cosine + y,
+//                            0.0f, 0.0f, 1.0f });
+// }
 
-void Piece::flipVertical(const sf::Vector2f& originWorldPos, float t)
-{
-    transformWorldCoords({ 1.0f-t, 0.0f, t * originWorldPos.x,
-                           0.0f, 1.0f, 0.0f,
-                           0.0f, 0.0f, 1.0f });
-}
-void Piece::flipHorizontal(const sf::Vector2f& originWorldPos, float t)
-{
-    transformWorldCoords({ 1.0f, 0.0f, 0.0f,
-                           0.0f, 1.0f-t, t * originWorldPos.y,
-                           0.0f, 0.0f, 1.0f });
-}
+// void Piece::flipVertical(const sf::Vector2f& originWorldPos, float t)
+// {
+//     transformWorldCoords({ 1.0f-t, 0.0f, t * originWorldPos.x,
+//                            0.0f, 1.0f, 0.0f,
+//                            0.0f, 0.0f, 1.0f });
+// }
+// void Piece::flipHorizontal(const sf::Vector2f& originWorldPos, float t)
+// {
+//     transformWorldCoords({ 1.0f, 0.0f, 0.0f,
+//                            0.0f, 1.0f-t, t * originWorldPos.y,
+//                            0.0f, 0.0f, 1.0f });
+// }
 
-ActionResponse Piece::onClick(const sf::Vector2i& gridPos)
+ActionResponse Piece::onMouseActivate(const sf::Vector2i& gridPos)
 {
     std::cout << "Clicked Grid (" << gridPos.x << ", " << gridPos.y << ") of Piece " << pieceIdx << "; ";
     for (Operator* op : mainOperators) {
@@ -176,7 +143,7 @@ ActionResponse Piece::onClick(const sf::Vector2i& gridPos)
     std::cout << "Operation Invalid" << std::endl;
     return INVALID;
 }
-ActionResponse Piece::onSlide(Direction direction)
+ActionResponse Piece::onMouseSlide(Direction direction)
 {
     std::cout << "Slided Piece " << pieceIdx << " in Direction " << direction << "; ";
     if (movementOperators[direction])
@@ -262,16 +229,6 @@ void Piece::reject(Operator& op)
 {
 }
 
-// void Piece::trigger(const sf::Vector2i& gridPos)
-// { // TODO
-//     std::cout << "Piece " << pieceIdx
-//               << " trigger " << gridPos.x << " " << gridPos.y << std::endl;
-//     if (pieceIdx % 2)
-//         flipHorizontal(level.getCenterCoords(), .3f);
-//     else
-//         rotate(level.getCenterCoords(), .2f);
-// }
-
 void Piece::update()
 {
     vertexArray.clear();
@@ -284,16 +241,16 @@ void Piece::update()
     for (Operator* op : mainOperators)
         op->update();
 }
-void Piece::initializeAnimation()
-{
-    vertexArrayOld = vertexArray;
-    animationTimer = new sf::Clock{};
-}
-void Piece::endAnimation()
-{
-    vertexArrayOld.clear();
-    delete animationTimer;
-}
+// void Piece::initializeAnimation()
+// {
+//     vertexArrayOld = vertexArray;
+//     animationTimer = new sf::Clock{};
+// }
+// void Piece::endAnimation()
+// {
+//     vertexArrayOld.clear();
+//     delete animationTimer;
+// }
 
 void Piece::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
@@ -302,4 +259,13 @@ void Piece::draw(sf::RenderTarget& target, sf::RenderStates states) const
         if (op) target.draw(*op, states);
     for (const Operator* op : mainOperators)
         target.draw(*op, states);
+}
+
+void Piece::acceptTransform(const sf::Transform& transform)
+{
+    DrawableShape::acceptTransform(transform);
+    for (Operator* op : movementOperators)
+        if (op) (*op).acceptTransform(transform);
+    for (Operator* op : mainOperators)
+        (*op).acceptTransform(transform);
 }

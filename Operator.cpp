@@ -45,23 +45,10 @@ Operator::Operator(Level& level, Piece& owner, OperatorData& data, sf::Vector2f 
 OperatorType Operator::getType() const { return data.type; }
 const sf::Vector2i& Operator::getGridPosition() const { return data.gridPos; }
 
-bool Operator::isMovementOperator() const
-{
-    return data.type == MOV_E || data.type == MOV_S || data.type == MOV_W || data.type == MOV_N;
-}
-
 void Operator::setGridPosition(const sf::Vector2i& otherGridPos)
 {
     data.gridPos = otherGridPos;
     worldPos = owner.getLevel().mapGridToPixel(data.gridPos);
-}
-void Operator::setWorldPosition(const sf::Vector2f& otherWorldPos)
-{
-    worldPos = otherWorldPos;
-}
-void Operator::setRotation(float angleInRad)
-{
-    //TODO!!!
 }
 
 void Operator::mapGridPosInplace(sf::Vector2i& otherGridPos) const

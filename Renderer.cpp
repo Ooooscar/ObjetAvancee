@@ -1,4 +1,5 @@
 #include "Renderer.hpp"
+#include "Button.hpp"
 #include "LevelEventHandler.hpp"
 #include "ResourceManager.hpp"
 
@@ -9,18 +10,18 @@ Renderer::Renderer(const std::vector<LevelData>& levels)
 			  "Piece Out" }
     , centerCoords{window.mapPixelToCoords(sf::Vector2i{window.getSize()}) / 2.0f}
 	, gridSizeInPixels{std::min(centerCoords.x, centerCoords.y) / 6.0f}
-	, indexCurrentLevel{0}
-    , currentLevel{levels[0], centerCoords, gridSizeInPixels}
+    , currentLevel{new Level{levels[0], centerCoords, gridSizeInPixels}}
 {
 	window.setFramerateLimit(30);
 }
 
 void Renderer::run()
 {
-    std::wstring message{L"Piece Out Niveau " + std::to_wstring(indexCurrentLevel + 1)};
+    // std::wstring message{L"Piece Out Niveau " + std::to_wstring(indexCurrentLevel + 1)};
 
-    // LevelEventHandler handler{currentLevel};
-    LevelStateContext context{currentLevel};
+    GameStateContext context{currentLevel};
+
+    ButtonHello hello{{20.f, 20.f}};
 
 	while (window.isOpen())
 	{
@@ -54,20 +55,23 @@ void Renderer::run()
         window.clear();
         window.setView(window.getDefaultView());
 
-        // les affichages
-        if (currentLevel.isInAnimation()) {
+        // if (currentLevel.isInAnimation()) {
             // currentLevel.update();
             // if (!currentLevel.isOnAnimation() && currentLevel.isFinished()) {
             //     message = L"Vous avez gagné !";
             // }
-        }
-                    
-        window.draw(currentLevel);
+        // }
+
+        // les affichages  
+        window.draw(*currentLevel);
+
+        window.draw(hello);
         // TODO
-        sf::Text text{message, ResourceManager::getInstance().getTextFont()};
-        text.setFillColor(sf::Color::Yellow);
-        text.setCharacterSize(100); // en pixels
-        window.draw(text);
+        // sf::Text text{message, ResourceManager::getInstance().getTextFont()};
+        // text.setFillColor(sf::Color::Yellow);
+        // text.setCharacterSize(100); // en pixels
+        // window.draw(text);
+
 
         // sf::RectangleShape rect{sf::Vector2f{150,150}};
         // rect.setPosition(1000, 0);

@@ -35,7 +35,6 @@ Level::Level(const LevelData &levelData, const sf::Vector2f& centerCoords, float
     , finished{false}
     , centerCoords{centerCoords}
     , gridSizeInPixels{gridSizeInPixels}
-    , movingPiece{nullptr}
 {
     pieces.reserve(colors.size());
     operators.reserve(dataOfOperators.size());
@@ -109,13 +108,11 @@ Level::Level(const LevelData &levelData, const sf::Vector2f& centerCoords, float
     }
 }
 
-bool Level::isInAnimation() const
-{
-    // return movingPiece;
-    return false; // TODO
-}
+// bool Level::isInAnimation() const
+// {
+//     return false; // TODO
+// }
 
-const Operator& Level::getOperatorAt(int operatorIdx) const { return operators[operatorIdx]; }
 const sf::Vector2f& Level::getCenterCoords() const { return centerCoords; }
 float Level::getGridSizeInPixels() const { return gridSizeInPixels; }
 

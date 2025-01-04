@@ -2,96 +2,93 @@
 #define _PIECEOUT_LEVEL_EVENT_HANDLER
 #include "Piece.hpp" // pour Direction
 #include <SFML/Graphics.hpp>
-
 class Level;
+class Button;
 
-class LevelState
-{
-protected:
-    Level& level;
-    sf::Vector2f currentGridPos_f;
-    sf::Vector2i currentGridPos;
-    LevelState(Level& level, const sf::Vector2i& currentGridPos);
-    bool levelContainsCurrentPos() const;
-public:
-    virtual ~LevelState() = default;
-    LevelState(const LevelState&) = delete;
-    LevelState& operator=(const LevelState&) = delete;
 
-    virtual LevelState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos);
-    virtual LevelState* onMouseClick();
-    virtual LevelState* onMouseRelease();
-};
+class GameState;
 
-class LevelStateContext
+class GameStateContext
 {
 private:
-    LevelState* currentState;
+    GameState* currentState;
 public:
-    LevelStateContext(Level& level);
-    ~LevelStateContext();
-    LevelStateContext(const Level&) = delete;
-    LevelStateContext& operator=(const LevelStateContext&) = delete;
+    GameStateContext(Level* level);
+    ~GameStateContext();
+    GameStateContext(const GameStateContext&) = delete;
+    GameStateContext& operator=(const GameStateContext&) = delete;
 
     void handleMousePositionUpdate(const sf::Vector2f& mouseWorldPos);
     void handleMouseClick();
     void handleMouseRelease();
 };
 
+class GameState
+{
+protected:
+    GameState() = default;
+public:
+    virtual ~GameState() = default;
+    GameState(const GameState&) = delete;
+    GameState& operator=(const GameState&) = delete;
+
+    virtual GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos);
+    virtual GameState* onMouseClick();
+    virtual GameState* onMouseRelease();
+};
+
+class StateMainMenu : public GameState
+{
+protected:
+    std::vector<Button> buttons;
+public:
+    StateMainMenu();
+    GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
+    GameState* onMouseClick() override;
+    GameState* onMouseRelease() override;
+};
+
+class LevelState : public GameState
+{
+protected:
+    Level* level;
+    sf::Vector2f currentGridPos_f;
+    sf::Vector2i currentGridPos;
+    virtual ~LevelState();
+    bool levelContainsCurrentPos() const;
+public:
+    LevelState(Level* level, const sf::Vector2i& currentGridPos);
+    GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
+};
+
 class LevelStateIdle : public LevelState
 {
 public:
-    LevelStateIdle(Level& level, const sf::Vector2i& currentGridPos);
-    LevelState* onMouseClick() override;
+    LevelStateIdle(Level* level, const sf::Vector2i& currentGridPos);
+    GameState* onMouseClick() override;
 };
 
-class LevelStateSelected : public LevelState
+class LevelStatePieceSelected : public LevelState
 {
-private:
+protected:
     int selectedPieceIdx;
     sf::Vector2i lastGridPos;
 public:
-    LevelStateSelected(Level& level, int selectedPieceIdx, const sf::Vector2i& currentGridPos);
-    LevelState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
-    LevelState* onMouseRelease() override;
+    LevelStatePieceSelected(Level* level, int selectedPieceIdx, const sf::Vector2i& currentGridPos);
+    GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
+    GameState* onMouseRelease() override;
 };
 
-class LevelStateSliding : public LevelStateSelected
+class LevelStatePieceSliding : public LevelStatePieceSelected
 {
-private:
-    int selectedPieceIdx;
+protected:
     Direction* direction;
-    sf::Vector2i lastGridPos, startingGridPos;
+    sf::Vector2i startingGridPos;
+    virtual ~LevelStatePieceSliding();
 public:
-    virtual ~LevelStateSliding();
-    LevelStateSliding(Level& level, int selectedPieceIdx, Direction* direction, const sf::Vector2i& currentGridPos, const sf::Vector2i& startingGridPos);
-    LevelState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
-    LevelState* onMouseRelease() override;
+    LevelStatePieceSliding(Level* level, int selectedPieceIdx, Direction* direction, const sf::Vector2i& currentGridPos, const sf::Vector2i& startingGridPos);
+    GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
+    GameState* onMouseRelease() override;
 };
-
-// enum LevelControlState
-// {
-//     IDLE,
-//     PIECE_SELECTED,
-//     SLIDING_VERTICAL,
-//     SLIDING_HORIZONTAL,
-//     SLIDING_ANY,
-// };
-
-// class LevelEventHandler
-// {
-// private:
-//     Level& level;
-//     LevelControlState state;
-//     sf::Vector2f currentWorldPos;
-//     sf::Vector2f currentGridPos_f;
-//     sf::Vector2i currentGridPos, lastGridPos, startingGridPos;
-//     int selectedPieceIdx;
-// public:
-//     LevelEventHandler(Level& level);
-//     void updateMousePosition(const sf::Vector2f& mouseWorldPos);
-//     void onMouseClick();
-//     void onMouseRelease();
-// };
 
 #endif

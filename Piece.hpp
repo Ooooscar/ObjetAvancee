@@ -5,6 +5,21 @@
 #include <SFML/Graphics.hpp>
 #include <array>
 
+enum Direction
+{
+    E = 0,
+    S = 1,
+    W = 2,
+    N = 3,
+};
+
+enum ActionResponse
+{
+    INVALID,
+    REJECTED,
+    ACCEPTED,
+};
+
 class PieceColor
 {
 public:
@@ -19,21 +34,6 @@ public:
     static const PieceColor CYAN;
     static const PieceColor BLUE;
     static const PieceColor PURPLE;
-};
-
-enum Direction
-{
-    E = 0,
-    S = 1,
-    W = 2,
-    N = 3,
-};
-
-enum ActionResponse
-{
-    INVALID,
-    REJECTED,
-    ACCEPTED,
 };
 
 class PieceData
@@ -64,13 +64,15 @@ private:
     bool atCorrectPosition;
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+    void acceptTransform(const sf::Transform& transform) override;
 public:
     Piece(const PieceData& data, Level& level, int pieceIdx);
 
     virtual ~Piece();
     Piece(const Piece&) = delete;
     Piece& operator=(const Piece&) = delete;
-    Piece(Piece&&) = default;
+    Piece(Piece&&) = default; // comme le constructeur de déplacement est défini,
+                              // on peut mettre les `Piece`s dans un `std::vector`
     Piece& operator=(Piece&&) = delete;
 
     const Level& getLevel() const;
@@ -82,21 +84,21 @@ public:
     bool addOperator(Operator& op);
     void setHasCorrectPosition();
 
-    void transformWorldCoords(const sf::Transform& transform);
-    void move(int direction, float progress);
-    void rotate(const sf::Vector2f& originWorldPos, float angleInRad);
-    void flipVertical(const sf::Vector2f& originWorldPos, float progress);
-    void flipHorizontal(const sf::Vector2f& originWorldPos, float progress);
+    // void transformWorldCoords(const sf::Transform& transform);
+    // void move(int direction, float progress);
+    // void rotate(const sf::Vector2f& originWorldPos, float angleInRad);
+    // void flipVertical(const sf::Vector2f& originWorldPos, float progress);
+    // void flipHorizontal(const sf::Vector2f& originWorldPos, float progress);
 
-    ActionResponse onSlide(Direction direction);
-    ActionResponse onClick(const sf::Vector2i& gridPos);
+    ActionResponse onMouseSlide(Direction direction);
+    ActionResponse onMouseActivate(const sf::Vector2i& gridPos);
     ActionResponse trigger(Operator& op);
     void accept(Operator& op);
     void reject(Operator& op);
 
     void update();
-    void initializeAnimation();
-    void endAnimation();
+    // void initializeAnimation();
+    // void endAnimation();
 };
 
 #endif

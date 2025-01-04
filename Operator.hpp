@@ -41,14 +41,12 @@ public:
 
 	OperatorType getType() const;
 	const sf::Vector2i& getGridPosition() const;
-	bool isMovementOperator() const;
 
 	void setGridPosition(const sf::Vector2i& otherGridPos);
-	void setWorldPosition(const sf::Vector2f& otherWorldPos);
-	void setRotation(float angleInRad);
 
 	void mapGridPosInplace(sf::Vector2i& otherGridPos) const;
 	bool acceptOperator(const Operator& other);
+
 	void accept();
 	void reject();
 
