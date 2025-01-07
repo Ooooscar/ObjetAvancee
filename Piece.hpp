@@ -55,7 +55,7 @@ private:
     Level& level;
     const int pieceIdx;
 
-    std::array<Operator*, 4> movementOperators;
+    std::array<MovementOperator*, 4> movementOperators;
 	std::vector<Operator*> mainOperators;
 
     std::vector<sf::Vertex> vertexArrayOld;

@@ -51,28 +51,32 @@ const bool Piece::canMoveInDirection(Direction direction) const { return movemen
 void Piece::setHasCorrectPosition() { hasCorrectPosition = true; }
 bool Piece::addOperator(Operator& op)
 {
-    switch (op.getType())
-    {
-    case MOV_E:
-        if (movementOperators[E]) return false;
-        movementOperators[E] = &op;
-        return true;
-    case MOV_S:
-        if (movementOperators[S]) return false;
-        movementOperators[S] = &op;
-        return true;
-    case MOV_W:
-        if (movementOperators[W]) return false;
-        movementOperators[W] = &op;
-        return true;
-    case MOV_N:
-        if (movementOperators[N]) return false;
-        movementOperators[N] = &op;
-        return true;
-    default:
+    MovementOperator* moveOp = dynamic_cast<MovementOperator*>(&op);
+    if (moveOp) {
+        switch (moveOp->getType()) {
+            case MOV_E:
+                if (movementOperators[E]) return false;
+                movementOperators[E] = moveOp;
+                break;
+            case MOV_S:
+                if (movementOperators[S]) return false;
+                movementOperators[S] = moveOp;
+                break;
+            case MOV_W:
+                if (movementOperators[W]) return false;
+                movementOperators[W] = moveOp;
+                break;
+            case MOV_N:
+                if (movementOperators[N]) return false;
+                movementOperators[N] = moveOp;
+                break;
+            default:
+                throw std::runtime_error("Type d'opérateur du movement invalide !");
+        }
+    } else {
         mainOperators.emplace_back(&op);
-        return true;
     }
+    return true;
 }
 
 // void Piece::transformWorldCoords(const sf::Transform& transform)
@@ -196,30 +200,33 @@ void Piece::accept(Operator& op)
         level.setCurrent(gridPos, pieceIdx + 2);
     }
     for (Operator* otherOp : movementOperators) {
-        if (otherOp) otherOp->acceptOperator(op);
+        if (otherOp) {
+            op.mapGridPosInplace(otherOp->gridPos);
+            op.mapOperatorTypeInplace(*otherOp);
+        }
     }
     for (Operator* otherOp : mainOperators) {
-        otherOp->acceptOperator(op);
+        op.mapGridPosInplace(otherOp->gridPos);
+        op.mapOperatorTypeInplace(*otherOp);
     }
-    switch (op.getType())
-    {
-    case ROT_CW:
-        std::swap(movementOperators[N], movementOperators[W]);
-        std::swap(movementOperators[W], movementOperators[S]);
-        std::swap(movementOperators[S], movementOperators[E]);
-        break;
-    case ROT_CCW:
-        std::swap(movementOperators[N], movementOperators[E]);
-        std::swap(movementOperators[E], movementOperators[S]);
-        std::swap(movementOperators[S], movementOperators[W]);
-        break;
-    case FLP_HOR:
-        std::swap(movementOperators[E], movementOperators[W]);
-        break;
-    case FLP_VRT:
-        std::swap(movementOperators[S], movementOperators[N]);
-        break;
-    default: break;
+    switch (op.getType()) {
+        case ROT_CW:
+            std::swap(movementOperators[N], movementOperators[W]);
+            std::swap(movementOperators[W], movementOperators[S]);
+            std::swap(movementOperators[S], movementOperators[E]);
+            break;
+        case ROT_CCW:
+            std::swap(movementOperators[N], movementOperators[E]);
+            std::swap(movementOperators[E], movementOperators[S]);
+            std::swap(movementOperators[S], movementOperators[W]);
+            break;
+        case FLP_HOR:
+            std::swap(movementOperators[E], movementOperators[W]);
+            break;
+        case FLP_VRT:
+            std::swap(movementOperators[S], movementOperators[N]);
+            break;
+        default: break;
     }
     
     update();

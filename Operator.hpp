@@ -1,7 +1,7 @@
 #ifndef _PIECEOUT_OPERATOR
 #define _PIECEOUT_OPERATOR
-#include <SFML/Graphics.hpp>
 #include "DrawableShape.hpp"
+#include <SFML/Graphics.hpp>
 
 enum OperatorType
 {
@@ -27,30 +27,62 @@ public:
 	OperatorData(OperatorType type, const sf::Vector2i& gridPos);
 };
 
-class Operator : public DrawableShape
+class Operator;
+
+class OperatorFactory
 {
 private:
-	Level& level;
-	Piece& owner;
-	OperatorData& data;
+	const Level& level;
+public:
+	OperatorFactory(const Level& level);
+	Operator* createOperator(const OperatorData& data, Piece& source);
+};
+
+class Operator : public OperatorData, public DrawableShape
+{
+protected:
+	Piece& source;
 	sf::Vector2f worldPos;
 
-	Operator(Level& level, Piece& owner, OperatorData& data, sf::Vector2f worldPos);
+	Operator(const OperatorData& data, Piece& source, sf::Vector2f&& worldPos);
+	friend class OperatorFactory;
 public:
-	Operator(Level& level, Piece& owner, OperatorData& data);
-
 	OperatorType getType() const;
 	const sf::Vector2i& getGridPosition() const;
 
 	void setGridPosition(const sf::Vector2i& otherGridPos);
 
-	void mapGridPosInplace(sf::Vector2i& otherGridPos) const;
-	bool acceptOperator(const Operator& other);
+	virtual void mapGridPosInplace(sf::Vector2i& otherGridPos) const = 0;
+	virtual void mapOperatorTypeInplace(Operator& other) const = 0;
 
-	void accept();
-	void reject();
+	virtual void update();
+};
 
-	void update();
+class MovementOperator : public Operator
+{
+protected:
+	using Operator::Operator;
+public:
+	void mapGridPosInplace(sf::Vector2i& otherGridPos) const override;
+	void mapOperatorTypeInplace(Operator& other) const override;
+};
+
+class RotationOperator : public Operator
+{
+protected:
+	using Operator::Operator;
+public:
+	void mapGridPosInplace(sf::Vector2i& otherGridPos) const override;
+	void mapOperatorTypeInplace(Operator& other) const override;
+};
+
+class FlipOperator : public Operator
+{
+protected:
+	using Operator::Operator;
+public:
+	void mapGridPosInplace(sf::Vector2i& otherGridPos) const override;
+	void mapOperatorTypeInplace(Operator& other) const override;
 };
 
 #endif

@@ -69,6 +69,7 @@ void Level::initializePiecesAndOperators()
 	for (int pieceIdx = 0; pieceIdx < static_cast<int>(colors.size()); ++pieceIdx) {
 		pieces.emplace_back(Piece{{{}, colors[pieceIdx]}, *this, pieceIdx});
 	}
+
     int cellIdx = 0;
 	for (int y = 0; y < nRow; ++y) {
 		for (int x = 0; x < nCol; ++x) {
@@ -93,18 +94,20 @@ void Level::initializePiecesAndOperators()
 			++cellIdx;
 		}
 	}
-    for (OperatorData& opData : dataOfOperators)
-    {
-        int pieceIdx = getCurrent(opData.gridPos) - 2;
-        if (pieceIdx >= 0)
-        {
-            operators.emplace_back(*this, pieces[pieceIdx], opData);
-            pieces[pieceIdx].addOperator(operators.back());
-        }
+
+    OperatorFactory opFactory{*this};
+    for (OperatorData& opData : dataOfOperators) {
+        Piece* source = getPieceAtGrid(opData.gridPos);
+        if (!source)
+            throw std::runtime_error("Position d'opérateur invalide !");
+        Operator* op = opFactory.createOperator(opData, *source);
+        
+                // la traitement des erreurs est fait dans `OperatorFactory`
+        operators.emplace_back(std::move(op));
+        source->addOperator(*operators.back());
     }
 
-    for (Piece& piece : pieces)
-    {
+    for (Piece& piece : pieces) {
         piece.update();
     }
 }
@@ -145,6 +148,12 @@ sf::Vector2f Level::mapGridToPixel(const sf::Vector2f& gridPos) const
     return { (gridPos.x - nCol * 0.5f) * gridSizeInPixels + centerCoords.x,
 		     (gridPos.y - nRow * 0.5f) * gridSizeInPixels + centerCoords.y };
 }
+
+Piece* Level::getPieceAtGrid(const sf::Vector2i& gridPos) {
+    int pieceIdx = getCurrent(gridPos) - 2;
+    return (pieceIdx < 0) ? nullptr : &pieces[pieceIdx];
+}
+
 void Level::addSquareTo(std::vector<sf::Vertex>& vertexArray, const sf::Vector2i& topLeftGridPos, const sf::Color& color)
 {
     sf::Vector2f topLeftPos{mapGridToPixel(topLeftGridPos)};
@@ -165,6 +174,6 @@ void Level::draw(sf::RenderTarget& target, sf::RenderStates states) const
     DrawableShape::draw(target, states);
     for (const Piece& piece : pieces)
         target.draw(piece);
-    for (const Operator& op : operators)
-        target.draw(op);
+    for (const Operator* op : operators)
+        target.draw(*op);
 }

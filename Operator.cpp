@@ -5,8 +5,7 @@
 #include <array>
 #include <cmath>
 
-const std::array<const std::vector<sf::Vector2f>, OperatorType::Count> vertexPatterns
-{
+const std::array<const std::vector<sf::Vector2f>, OperatorType::Count> vertexPatterns {
     // movement east
     std::vector<sf::Vector2f>{{0.88f, 0.5f}, {0.7f, 0.36f}, {0.7f, 0.64f}},
     // movement south
@@ -30,30 +29,54 @@ OperatorData::OperatorData(OperatorType type, const sf::Vector2i& gridPos)
     , gridPos{gridPos}
 {}
 
-Operator::Operator(Level& level, Piece& owner, OperatorData& data)
-    : Operator(level, owner, data, level.mapGridToPixel(data.gridPos))
+OperatorFactory::OperatorFactory(const Level& level)
+    : level{level}
 {}
 
-Operator::Operator(Level& level, Piece& owner, OperatorData& data, sf::Vector2f worldPos)
-    : DrawableShape{std::vector<sf::Vertex>(vertexPatterns[data.type].size()), sf::TriangleStrip}
-    , level{level}
-    , owner{owner}
-    , data{data}
-    , worldPos{worldPos}
+Operator* OperatorFactory::createOperator(const OperatorData& data, Piece& source) {
+    switch (data.type) {
+        case MOV_E:
+        case MOV_S:
+        case MOV_W:
+        case MOV_N:
+            return new MovementOperator(data, source, level.mapGridToPixel(data.gridPos));
+            break;
+        case ROT_CW:
+        case ROT_CCW:
+            return new RotationOperator(data, source, level.mapGridToPixel(data.gridPos));
+        case FLP_HOR:
+        case FLP_VRT:
+            return new FlipOperator(data, source, level.mapGridToPixel(data.gridPos));
+        default:
+            throw std::runtime_error("Type d'opérateur invalide !");
+    }
+}
+
+Operator::Operator(const OperatorData& data, Piece& source, sf::Vector2f&& worldPos)
+    : OperatorData{data} // on veut faire une copie ici
+    , DrawableShape{std::vector<sf::Vertex>(vertexPatterns[type].size()), sf::TriangleStrip}
+    , source{source}
+    , worldPos{std::move(worldPos)}
 {}
 
-OperatorType Operator::getType() const { return data.type; }
-const sf::Vector2i& Operator::getGridPosition() const { return data.gridPos; }
+OperatorType Operator::getType() const { return type; }
+const sf::Vector2i& Operator::getGridPosition() const { return gridPos; }
 
-void Operator::setGridPosition(const sf::Vector2i& otherGridPos)
-{
-    data.gridPos = otherGridPos;
-    worldPos = owner.getLevel().mapGridToPixel(data.gridPos);
+void Operator::setGridPosition(const sf::Vector2i& otherGridPos) {
+    gridPos = otherGridPos;
+    worldPos = source.getLevel().mapGridToPixel(gridPos);
+}
+
+void Operator::update() {
+    float gridSizeInPixels = source.getLevel().getGridSizeInPixels();
+    vertexArray.clear();
+    for (const sf::Vector2f& v : vertexPatterns[type])
+        vertexArray.emplace_back(source.getLevel().mapGridToPixel(gridPos) + gridSizeInPixels * v);
 }
 
 void Operator::mapGridPosInplace(sf::Vector2i& otherGridPos) const
 {
-    switch (data.type)
+    switch (type)
     {
     case MOV_E: ++otherGridPos.x; break;
     case MOV_S: ++otherGridPos.y; break;
@@ -61,97 +84,100 @@ void Operator::mapGridPosInplace(sf::Vector2i& otherGridPos) const
     case MOV_N: --otherGridPos.y; break;
     case ROT_CW:
         {   // Rotation 90° horarire : (x, y) -> (y, -x)
-            int xTmp = data.gridPos.x - (otherGridPos.y - data.gridPos.y);
-            otherGridPos.y = data.gridPos.y + (otherGridPos.x - data.gridPos.x);
+            int xTmp = gridPos.x - (otherGridPos.y - gridPos.y);
+            otherGridPos.y = gridPos.y + (otherGridPos.x - gridPos.x);
             otherGridPos.x = xTmp;
         }
         break;
     case ROT_CCW:
         {   // Rotation 90° anti-horarire : (x, y) -> (-y, x)
-            int xTmp = data.gridPos.x + (otherGridPos.y - data.gridPos.y);
-            otherGridPos.y = data.gridPos.y - (otherGridPos.x - data.gridPos.x);
+            int xTmp = gridPos.x + (otherGridPos.y - gridPos.y);
+            otherGridPos.y = gridPos.y - (otherGridPos.x - gridPos.x);
             otherGridPos.x = xTmp;
         }
         break;
     case FLP_HOR:
         {   // Réflexion par rapport à l'axe des y : (x, y) -> (-x, y)
-            otherGridPos.x = 2*data.gridPos.x - otherGridPos.x;
+            otherGridPos.x = 2*gridPos.x - otherGridPos.x;
         }
         break;
     case FLP_VRT:
         {   // Réflexion par rapport à l'axe des x : (x, y) -> (x, -y)
-            otherGridPos.y = 2*data.gridPos.y - otherGridPos.y;
+            otherGridPos.y = 2*gridPos.y - otherGridPos.y;
         }
         break;
     default:
         break;
     }
 }
-bool Operator::acceptOperator(const Operator& other)
-{
-    other.mapGridPosInplace(data.gridPos);
-    switch (other.data.type)
-    {
-    case ROT_CW:
-        switch (data.type)
-        {
-        case MOV_E: data.type = MOV_S; break;
-        case MOV_S: data.type = MOV_W; break;
-        case MOV_W: data.type = MOV_N; break;
-        case MOV_N: data.type = MOV_E; break;
-        case FLP_HOR: data.type = FLP_VRT; break;
-        case FLP_VRT: data.type = FLP_HOR; break;
-        default: return false;
-        }
-        break;
-    case ROT_CCW:
-        switch (data.type)
-        {
-        case MOV_E: data.type = MOV_N; break;
-        case MOV_S: data.type = MOV_E; break;
-        case MOV_W: data.type = MOV_S; break;
-        case MOV_N: data.type = MOV_W; break;
-        case FLP_HOR: data.type = FLP_VRT; break;
-        case FLP_VRT: data.type = FLP_HOR; break;
-        default: return false;
-        }
-        break;
-    case FLP_HOR:
-        switch (data.type)
-        {
-        case MOV_E: data.type = MOV_W; break;
-        case MOV_W: data.type = MOV_E; break;
-        case ROT_CW: data.type = ROT_CCW; break;
-        case ROT_CCW: data.type = ROT_CW; break;
-        default: return false;
-        }
-        break;
-    case FLP_VRT:
-        switch (data.type)
-        {
-        case MOV_S: data.type = MOV_N; break;
-        case MOV_N: data.type = MOV_S; break;
-        case ROT_CW: data.type = ROT_CCW; break;
-        case ROT_CCW: data.type = ROT_CW; break;
-        default: return false;
-        }
-        break;
-    default: return false;
+
+void MovementOperator::mapGridPosInplace(sf::Vector2i& otherGridPos) const {
+    switch (type) {
+        case MOV_E: ++otherGridPos.x; break;
+        case MOV_S: ++otherGridPos.y; break;
+        case MOV_W: --otherGridPos.x; break;
+        case MOV_N: --otherGridPos.y; break;
+        default: throw std::runtime_error("Orientation de mouvement invalide !");
     }
-    return true;
+}
+void MovementOperator::mapOperatorTypeInplace(Operator& other) const {
+    // rien à faire
 }
 
-void Operator::accept()
-{
+void RotationOperator::mapGridPosInplace(sf::Vector2i& otherGridPos) const {
+    switch (type) {
+        case ROT_CW:
+            {   // Rotation 90° horarire : (x, y) -> (y, -x)
+                int xTmp = gridPos.x - (otherGridPos.y - gridPos.y);
+                otherGridPos.y = gridPos.y + (otherGridPos.x - gridPos.x);
+                otherGridPos.x = xTmp;
+            }
+            break;
+        case ROT_CCW:
+            {   // Rotation 90° anti-horarire : (x, y) -> (-y, x)
+                int xTmp = gridPos.x + (otherGridPos.y - gridPos.y);
+                otherGridPos.y = gridPos.y - (otherGridPos.x - gridPos.x);
+                otherGridPos.x = xTmp;
+            }
+            break;
+        default: throw std::runtime_error("Orientation de rotation invalide !");
+    }
 }
-void Operator::reject()
-{
+void RotationOperator::mapOperatorTypeInplace(Operator& other) const {
+    switch (other.type) {
+        case FLP_HOR: other.type = FLP_VRT; break;
+        case FLP_VRT: other.type = FLP_HOR; break;
+        case MOV_E: other.type = (type == ROT_CW) ? MOV_S : MOV_N; break;
+        case MOV_S: other.type = (type == ROT_CW) ? MOV_W : MOV_E; break;
+        case MOV_W: other.type = (type == ROT_CW) ? MOV_N : MOV_S; break;
+        case MOV_N: other.type = (type == ROT_CW) ? MOV_E : MOV_W; break;
+        default: break;
+    }
 }
 
-void Operator::update()
-{
-    float gridSizeInPixels = level.getGridSizeInPixels();
-    vertexArray.clear();
-    for (const sf::Vector2f& v : vertexPatterns[data.type])
-        vertexArray.emplace_back(level.mapGridToPixel(data.gridPos) + gridSizeInPixels * v);
+void FlipOperator::mapGridPosInplace(sf::Vector2i& otherGridPos) const {
+    switch (type) {
+        case FLP_HOR:
+            {   // Réflexion par rapport à l'axe des y : (x, y) -> (-x, y)
+                otherGridPos.x = 2*gridPos.x - otherGridPos.x;
+            }
+            break;
+        case FLP_VRT:
+            {   // Réflexion par rapport à l'axe des x : (x, y) -> (x, -y)
+                otherGridPos.y = 2*gridPos.y - otherGridPos.y;
+            }
+            break;
+        default: throw std::runtime_error("Orientation de symétrie invalide !");
+    }
+}
+void FlipOperator::mapOperatorTypeInplace(Operator& other) const {
+    switch (other.type) {
+        case ROT_CW: other.type = ROT_CCW; break;
+        case ROT_CCW: other.type = ROT_CW; break;
+        case MOV_E: if (type == FLP_HOR) other.type = MOV_W; break;
+        case MOV_S: if (type == FLP_VRT) other.type = MOV_N; break;
+        case MOV_W: if (type == FLP_HOR) other.type = MOV_E; break;
+        case MOV_N: if (type == FLP_VRT) other.type = MOV_S; break;
+        default: break;
+    }
 }

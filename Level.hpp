@@ -34,7 +34,7 @@ private:
 public:
     std::vector<Piece> pieces;
 private:
-    std::vector<Operator> operators;
+    std::vector<Operator*> operators;
     bool inAnimation;
     bool finished;
 
@@ -55,6 +55,7 @@ public:
     void addSquareTo(std::vector<sf::Vertex>& vertexArray, const sf::Vector2i& topLeftGridPos, const sf::Color& color = {});
 
 private:
+    Piece* getPieceAtGrid(const sf::Vector2i& gridPos);
     void initializePiecesAndOperators();
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
