@@ -12,13 +12,13 @@ Level* LevelManager::loadLevel(const sf::RenderWindow& window, int levelIdx) {
         window.mapPixelToCoords(sf::Vector2i{window.getSize()}) / 2.0f
     };
     return new Level{
-        levelDataList[levelIdx - 1],
+        levelList[levelIdx - 1],
         centerCoords,
         std::min(centerCoords.x, centerCoords.y) / 6.0f,
     };
 }
 
-const std::vector<LevelData> LevelManager::levelDataList{
+const std::vector<LevelData> LevelManager::levelList{
     {
         9, 8,
         {

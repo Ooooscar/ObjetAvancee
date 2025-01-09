@@ -5,7 +5,6 @@
 class Button;
 class Level;
 
-
 class GameState;
 
 class GameStateMachine
@@ -14,7 +13,6 @@ private:
     static GameStateMachine* context;
     GameStateMachine(sf::RenderWindow& window);
 public:
-    static void initializeStateMachine(sf::RenderWindow& window);
     static GameStateMachine& getContext();
     ~GameStateMachine();
     GameStateMachine(const GameStateMachine&) = delete;
@@ -24,6 +22,7 @@ private:
     GameState* currentState;
 public:
     sf::RenderWindow& window;
+    static void initializeStateMachine(sf::RenderWindow& window);
     void tick();
 };
 

@@ -58,8 +58,7 @@ private:
     std::array<MovementOperator*, 4> movementOperators;
 	std::vector<Operator*> mainOperators;
 
-    std::vector<sf::Vertex> vertexArrayOld;
-    sf::Clock* animationTimer;
+    // sf::Clock* animationTimer;
     bool hasCorrectPosition;
     bool atCorrectPosition;
 
@@ -68,7 +67,7 @@ private:
 public:
     Piece(const PieceData& data, Level& level, int pieceIdx);
 
-    virtual ~Piece();
+    virtual ~Piece() = default;
     Piece(const Piece&) = delete;
     Piece& operator=(const Piece&) = delete;
     Piece(Piece&&) = default; // comme le constructeur de déplacement est défini,
@@ -78,7 +77,7 @@ public:
     const Level& getLevel() const;
     const int getIndex() const;
     const bool isAtCorrectPosition() const;
-    const bool isInAnimation() const;
+    // const bool isInAnimation() const;
     const bool canMoveInDirection(Direction direction) const;
 
     bool addOperator(Operator& op);
@@ -96,7 +95,7 @@ public:
     void accept(Operator& op);
     void reject(Operator& op);
 
-    void update();
+    void rebuildMesh();
     // void initializeAnimation();
     // void endAnimation();
 };

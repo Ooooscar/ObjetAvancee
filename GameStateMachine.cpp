@@ -216,7 +216,11 @@ GameState* LevelStatePieceClicked::onMousePositionUpdate(const sf::Vector2f& mou
 }
 GameState* LevelStatePieceClicked::onMouseRelease() {
     level->pieces[selectedPieceIdx].onMouseActivate(currentGridPos);
-    return new LevelStateIdle{level, currentGridPos};
+    if (level->isFinished()) {
+        return new MainMenuState{};
+    } else {
+        return new LevelStateIdle{level, currentGridPos};
+    }
 }
 
 LevelStatePieceSliding::LevelStatePieceSliding(Level* level, int selectedPieceIdx, Direction* direction, const sf::Vector2i& currentGridPos, const sf::Vector2i& startingGridPos)
@@ -273,5 +277,9 @@ GameState* LevelStatePieceSliding::onMousePositionUpdate(const sf::Vector2f& mou
     return this;
 }
 GameState* LevelStatePieceSliding::onMouseRelease() {
-    return new LevelStateIdle(level, currentGridPos);
+    if (level->isFinished()) {
+        return new MainMenuState{};
+    } else {
+        return new LevelStateIdle{level, currentGridPos};
+    }
 }

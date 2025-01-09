@@ -35,7 +35,7 @@ private:
 	const Level& level;
 public:
 	OperatorFactory(const Level& level);
-	Operator* createOperator(const OperatorData& data, Piece& source);
+	Operator* createOperator(const OperatorData& data, Piece& source) const;
 };
 
 class Operator : public OperatorData, public DrawableShape
@@ -53,9 +53,9 @@ public:
 	void setGridPosition(const sf::Vector2i& otherGridPos);
 
 	virtual void mapGridPosInplace(sf::Vector2i& otherGridPos) const = 0;
-	virtual void mapOperatorTypeInplace(Operator& other) const = 0;
+	virtual void mapOperatorTypeInplace(OperatorType& type) const = 0;
 
-	virtual void update();
+	virtual void rebuildMesh();
 };
 
 class MovementOperator : public Operator
@@ -64,7 +64,7 @@ protected:
 	using Operator::Operator;
 public:
 	void mapGridPosInplace(sf::Vector2i& otherGridPos) const override;
-	void mapOperatorTypeInplace(Operator& other) const override;
+	void mapOperatorTypeInplace(OperatorType& type) const override;
 };
 
 class RotationOperator : public Operator
@@ -73,7 +73,7 @@ protected:
 	using Operator::Operator;
 public:
 	void mapGridPosInplace(sf::Vector2i& otherGridPos) const override;
-	void mapOperatorTypeInplace(Operator& other) const override;
+	void mapOperatorTypeInplace(OperatorType& type) const override;
 };
 
 class FlipOperator : public Operator
@@ -82,7 +82,7 @@ protected:
 	using Operator::Operator;
 public:
 	void mapGridPosInplace(sf::Vector2i& otherGridPos) const override;
-	void mapOperatorTypeInplace(Operator& other) const override;
+	void mapOperatorTypeInplace(OperatorType& otherType) const override;
 };
 
 #endif

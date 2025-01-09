@@ -9,11 +9,17 @@ CXX= g++
 CXXFLAGS= --std=c++11 -Wall -MMD
 
 # Options du PréProcesseur C ("CPP") :
-# -I : Spécifie le chemin des fichiers d'en-tête ("header files", .h et .hpp) 
+# -I : Spécifie le chemin des fichiers d'en-tête ("header files", .h et .hpp)
+##########################################################
+### IMPORTANT: IL FAUT VERIFIER CE CHEMIN DE FICHIER ! ###
+##########################################################
 CPPFLAGS= -I $(CURDIR)/SFML-2.6.1/include
 
 # Options du lien dynamique ("Linker (ld) Flags") :
 # -L : Spécifie le chemin des bibliothèques
+##########################################################
+### IMPORTANT: IL FAUT VERIFIER CE CHEMIN DE FICHIER ! ###
+##########################################################
 LDFLAGS= -L $(CURDIR)/SFML-2.6.1/lib
 # Si l'on est sur Windows:
 # -mwindows : ne pas afficher le console quand on fait démarrer le programme
@@ -32,9 +38,9 @@ RM= rm -f
 
 
 # Liste des fichiers sources
-# SOURCES = ebaucheModel.cpp ebaucheVue.cpp
+SOURCES = Main.cpp Button.cpp ResourceManager.cpp GameStateMachine.cpp LevelManager.cpp Level.cpp Piece.cpp DrawableShape.cpp Operator.cpp
 # Liste des fichers objets
-# OBJECTS = $(SOURCES:.cpp=.o)
+OBJECTS = $(SOURCES:.cpp=.o)
 
 
 # Cible par défaut de la commande "make" :
@@ -52,7 +58,7 @@ all: Main
 # $^ : Référence à tous les fils d'une règle
 Piece: Piece.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
-Main: Main.o Button.o ResourceManager.o GameStateMachine.o LevelManager.o Level.o Piece.o DrawableShape.o Operator.o
+Main: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 

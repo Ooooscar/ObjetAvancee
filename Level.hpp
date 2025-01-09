@@ -35,8 +35,7 @@ public:
     std::vector<Piece> pieces;
 private:
     std::vector<Operator*> operators;
-    bool inAnimation;
-    bool finished;
+    // bool inAnimation;
 
     sf::Vector2f centerCoords;
     float gridSizeInPixels;
@@ -44,10 +43,12 @@ public:
     Level(const LevelData& levelData, const sf::Vector2f& centerCoords, float gridSize);
     void restart();
 
-    bool contains(const sf::Vector2f& worldPos) const;
     const sf::Vector2f& getCenterCoords() const;
     float getGridSizeInPixels() const;
+
+    bool contains(const sf::Vector2f& worldPos) const;
     // bool isInAnimation() const;
+    bool isFinished() const;
 
     sf::Vector2f mapPixelToGrid(const sf::Vector2f& worldPos) const;
     sf::Vector2f mapGridToPixel(const sf::Vector2i& gridPos) const;
@@ -56,7 +57,8 @@ public:
 
 private:
     Piece* getPieceAtGrid(const sf::Vector2i& gridPos);
-    void initializePiecesAndOperators();
+    void rebuildMeshBackground();
+    void rebuildMeshPiecesAndOperators();
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
 

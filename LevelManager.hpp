@@ -9,7 +9,7 @@ class Level;
 class LevelManager
 {
 private:
-    static const std::vector<LevelData> levelDataList;
+    static const std::vector<LevelData> levelList;
     static LevelManager instance;
     
     LevelManager() = default;

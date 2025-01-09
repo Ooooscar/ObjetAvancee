@@ -31,21 +31,13 @@ Piece::Piece(const PieceData& data, Level& level, int pieceIdx)
     , pieceIdx{pieceIdx}
     , movementOperators{}
 	, mainOperators{}
-    , vertexArrayOld{}
-    , animationTimer{nullptr}
     , hasCorrectPosition{false}
     , atCorrectPosition{false}
 {}
 
-Piece::~Piece()
-{
-    delete animationTimer;
-}
-
 const Level& Piece::getLevel() const { return level; }
 const int Piece::getIndex() const { return pieceIdx; }
 const bool Piece::isAtCorrectPosition() const { return !hasCorrectPosition || atCorrectPosition; }
-const bool Piece::isInAnimation() const { return animationTimer; }
 const bool Piece::canMoveInDirection(Direction direction) const { return movementOperators[direction]; }
 
 void Piece::setHasCorrectPosition() { hasCorrectPosition = true; }
@@ -195,19 +187,23 @@ void Piece::accept(Operator& op)
         level.setCurrent(gridPos, 0);
         op.mapGridPosInplace(gridPos);
     }
-    for (sf::Vector2i& gridPos : gridCoords) {
-        // ici les `gridPos` sont des références
+    atCorrectPosition = true;
+    for (const sf::Vector2i& gridPos : gridCoords) {
+        // ici les `gridPos` sont des références const
         level.setCurrent(gridPos, pieceIdx + 2);
+        if (atCorrectPosition) {
+            atCorrectPosition = (level.getFinal(gridPos) == pieceIdx + 2);
+        }
     }
     for (Operator* otherOp : movementOperators) {
         if (otherOp) {
             op.mapGridPosInplace(otherOp->gridPos);
-            op.mapOperatorTypeInplace(*otherOp);
+            op.mapOperatorTypeInplace(otherOp->type);
         }
     }
     for (Operator* otherOp : mainOperators) {
         op.mapGridPosInplace(otherOp->gridPos);
-        op.mapOperatorTypeInplace(*otherOp);
+        op.mapOperatorTypeInplace(otherOp->type);
     }
     switch (op.getType()) {
         case ROT_CW:
@@ -229,14 +225,14 @@ void Piece::accept(Operator& op)
         default: break;
     }
     
-    update();
+    rebuildMesh();
 }
 
 void Piece::reject(Operator& op)
 {
 }
 
-void Piece::update()
+void Piece::rebuildMesh()
 {
     vertexArray.clear();
     vertexArray.reserve(gridCoords.size() * 6);
@@ -244,9 +240,9 @@ void Piece::update()
         level.addSquareTo(vertexArray, gridPos, color.primaryColor);
 
     for (Operator* op : movementOperators)
-        if (op) op->update();
+        if (op) op->rebuildMesh();
     for (Operator* op : mainOperators)
-        op->update();
+        op->rebuildMesh();
 }
 // void Piece::initializeAnimation()
 // {

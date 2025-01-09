@@ -27,13 +27,12 @@ void LevelData::setCurrent(const sf::Vector2i& gridPos, int value)
 }
 
 Level::Level(const LevelData& levelData, const sf::Vector2f& centerCoords, float gridSizeInPixels)
-    : LevelData{levelData}
+    : LevelData{levelData} // ceci est une copie
     , DrawableShape{{}, sf::Triangles}
-    , originalData{levelData}
+    , originalData{levelData} // ceci est une référence const vers levelData
     , pieces{}
     , operators{}
-    , inAnimation{false}
-    , finished{false}
+    // , inAnimation{false}
     , centerCoords{centerCoords}
     , gridSizeInPixels{gridSizeInPixels}
 {
@@ -46,29 +45,25 @@ Level::Level(const LevelData& levelData, const sf::Vector2f& centerCoords, float
     }
     vertexArray.reserve((nbFloorTiles + 1) * 6);
 
+    rebuildMeshBackground();
+    rebuildMeshPiecesAndOperators();
+}
+
+void Level::rebuildMeshBackground()
+{
+    vertexArray.clear();
     float levelW = nCol * gridSizeInPixels;
     float levelH = nRow * gridSizeInPixels;
     float x0 = centerCoords.x - levelW / 2;
     float x1 = centerCoords.x + levelW / 2;
     float y0 = centerCoords.y - levelH / 2;
     float y1 = centerCoords.y + levelH / 2;
-    // panneau central
     vertexArray.emplace_back(sf::Vertex{{x0, y0}, PieceColor::WALL.backgroundColor});
     vertexArray.emplace_back(sf::Vertex{{x1, y0}, PieceColor::WALL.backgroundColor});
     vertexArray.emplace_back(sf::Vertex{{x0, y1}, PieceColor::WALL.backgroundColor});
     vertexArray.emplace_back(sf::Vertex{{x1, y0}, PieceColor::WALL.backgroundColor});
     vertexArray.emplace_back(sf::Vertex{{x0, y1}, PieceColor::WALL.backgroundColor});
     vertexArray.emplace_back(sf::Vertex{{x1, y1}, PieceColor::WALL.backgroundColor});
-
-    // lecture des données des cases du niveau
-    initializePiecesAndOperators();
-}
-
-void Level::initializePiecesAndOperators()
-{
-	for (int pieceIdx = 0; pieceIdx < static_cast<int>(colors.size()); ++pieceIdx) {
-		pieces.emplace_back(Piece{{{}, colors[pieceIdx]}, *this, pieceIdx});
-	}
 
     int cellIdx = 0;
 	for (int y = 0; y < nRow; ++y) {
@@ -82,19 +77,35 @@ void Level::initializePiecesAndOperators()
 				break;
 			default	:
 				int pieceIdx = cellData - 2;
-				// if (pieceIdx < static_cast<int>(pieces.size()))
 				addSquareTo(vertexArray, {x, y}, colors[pieceIdx].backgroundColor);
-                pieces[pieceIdx].setHasCorrectPosition();
 				break;
-			}
-			int pieceIdx = gridCurrent[cellIdx] - 2;
-			if (pieceIdx >= 0) {
-                pieces[pieceIdx].emplaceCell({x, y});
 			}
 			++cellIdx;
 		}
 	}
+}
 
+void Level::rebuildMeshPiecesAndOperators()
+{
+    pieces.clear();
+    operators.clear();
+
+	for (int pieceIdx = 0; pieceIdx < static_cast<int>(colors.size()); ++pieceIdx) {
+		pieces.emplace_back(Piece{{{}, colors[pieceIdx]}, *this, pieceIdx});
+	}
+    int cellIdx = 0;
+	for (int y = 0; y < nRow; ++y) {
+		for (int x = 0; x < nCol; ++x) {
+			int pieceIdxFin = gridFinal[cellIdx] - 2;
+            if (pieceIdxFin >= 0)
+                pieces[pieceIdxFin].setHasCorrectPosition();
+			int pieceIdxCur = gridCurrent[cellIdx] - 2;
+			if (pieceIdxCur >= 0) {
+                pieces[pieceIdxCur].emplaceCell({x, y});
+			}
+			++cellIdx;
+		}
+	}
     OperatorFactory opFactory{*this};
     for (OperatorData& opData : dataOfOperators) {
         Piece* source = getPieceAtGrid(opData.gridPos);
@@ -108,7 +119,7 @@ void Level::initializePiecesAndOperators()
     }
 
     for (Piece& piece : pieces) {
-        piece.update();
+        piece.rebuildMesh(); // dans `Piece::rebuildMesh()`, les `Operator::rebuildMesh()` sont appelées
     }
 }
 
@@ -116,7 +127,7 @@ void Level::restart()
 {
     gridCurrent = originalData.gridCurrent;
     dataOfOperators = originalData.dataOfOperators;
-    initializePiecesAndOperators();
+    rebuildMeshPiecesAndOperators();
 }
 
 // bool Level::isInAnimation() const
@@ -131,6 +142,16 @@ bool Level::contains(const sf::Vector2f& worldPos) const
 {
     return vertexArray[0].position.x <= worldPos.x && vertexArray[1].position.x >= worldPos.x
         && vertexArray[0].position.y <= worldPos.y && vertexArray[2].position.y >= worldPos.y;
+}
+
+bool Level::isFinished() const
+{
+    for (const Piece& p : pieces) {
+        if (!p.isAtCorrectPosition()) {
+            return false;
+        }
+    }
+    return true;
 }
 
 sf::Vector2f Level::mapPixelToGrid(const sf::Vector2f& worldPos) const

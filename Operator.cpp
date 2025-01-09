@@ -33,7 +33,7 @@ OperatorFactory::OperatorFactory(const Level& level)
     : level{level}
 {}
 
-Operator* OperatorFactory::createOperator(const OperatorData& data, Piece& source) {
+Operator* OperatorFactory::createOperator(const OperatorData& data, Piece& source) const {
     switch (data.type) {
         case MOV_E:
         case MOV_S:
@@ -67,7 +67,7 @@ void Operator::setGridPosition(const sf::Vector2i& otherGridPos) {
     worldPos = source.getLevel().mapGridToPixel(gridPos);
 }
 
-void Operator::update() {
+void Operator::rebuildMesh() {
     float gridSizeInPixels = source.getLevel().getGridSizeInPixels();
     vertexArray.clear();
     for (const sf::Vector2f& v : vertexPatterns[type])
@@ -120,7 +120,7 @@ void MovementOperator::mapGridPosInplace(sf::Vector2i& otherGridPos) const {
         default: throw std::runtime_error("Orientation de mouvement invalide !");
     }
 }
-void MovementOperator::mapOperatorTypeInplace(Operator& other) const {
+void MovementOperator::mapOperatorTypeInplace(OperatorType& otherType) const {
     // rien à faire
 }
 
@@ -143,14 +143,14 @@ void RotationOperator::mapGridPosInplace(sf::Vector2i& otherGridPos) const {
         default: throw std::runtime_error("Orientation de rotation invalide !");
     }
 }
-void RotationOperator::mapOperatorTypeInplace(Operator& other) const {
-    switch (other.type) {
-        case FLP_HOR: other.type = FLP_VRT; break;
-        case FLP_VRT: other.type = FLP_HOR; break;
-        case MOV_E: other.type = (type == ROT_CW) ? MOV_S : MOV_N; break;
-        case MOV_S: other.type = (type == ROT_CW) ? MOV_W : MOV_E; break;
-        case MOV_W: other.type = (type == ROT_CW) ? MOV_N : MOV_S; break;
-        case MOV_N: other.type = (type == ROT_CW) ? MOV_E : MOV_W; break;
+void RotationOperator::mapOperatorTypeInplace(OperatorType& otherType) const {
+    switch (otherType) {
+        case FLP_HOR: otherType = FLP_VRT; break;
+        case FLP_VRT: otherType = FLP_HOR; break;
+        case MOV_E: otherType = (type == ROT_CW) ? MOV_S : MOV_N; break;
+        case MOV_S: otherType = (type == ROT_CW) ? MOV_W : MOV_E; break;
+        case MOV_W: otherType = (type == ROT_CW) ? MOV_N : MOV_S; break;
+        case MOV_N: otherType = (type == ROT_CW) ? MOV_E : MOV_W; break;
         default: break;
     }
 }
@@ -170,14 +170,14 @@ void FlipOperator::mapGridPosInplace(sf::Vector2i& otherGridPos) const {
         default: throw std::runtime_error("Orientation de symétrie invalide !");
     }
 }
-void FlipOperator::mapOperatorTypeInplace(Operator& other) const {
-    switch (other.type) {
-        case ROT_CW: other.type = ROT_CCW; break;
-        case ROT_CCW: other.type = ROT_CW; break;
-        case MOV_E: if (type == FLP_HOR) other.type = MOV_W; break;
-        case MOV_S: if (type == FLP_VRT) other.type = MOV_N; break;
-        case MOV_W: if (type == FLP_HOR) other.type = MOV_E; break;
-        case MOV_N: if (type == FLP_VRT) other.type = MOV_S; break;
+void FlipOperator::mapOperatorTypeInplace(OperatorType& otherType) const {
+    switch (otherType) {
+        case ROT_CW: otherType = ROT_CCW; break;
+        case ROT_CCW: otherType = ROT_CW; break;
+        case MOV_E: if (type == FLP_HOR) otherType = MOV_W; break;
+        case MOV_S: if (type == FLP_VRT) otherType = MOV_N; break;
+        case MOV_W: if (type == FLP_HOR) otherType = MOV_E; break;
+        case MOV_N: if (type == FLP_VRT) otherType = MOV_S; break;
         default: break;
     }
 }
