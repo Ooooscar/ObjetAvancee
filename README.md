@@ -6,7 +6,7 @@ Un ordinateur moderne, et une souris ! (mais il faut d'abord compiler la source.
 
 Le rapport PDF se trouve dans le même dossier.
 
-### Comment compiler le projet ?
+## Comment compiler le projet ?
 
 Il faut que vous avez déjà installé **GNU Make** et le compilateur **GCC**;
 n'oubliez pas de les inclure dans votre variable système `PATH`.
@@ -20,7 +20,7 @@ La bibliothèque `SFML` en version 2.6.1 est déjà incluse dans le projet.
 
 Après, vous pouvez effacer tous les fichers générés par `make clean`.
 
-### Comment executer le projet ?
+## Comment executer le projet ?
 
 Exécutez la commande `make test` dans le terminal depuis le dossier du projet,
 ou trouver l'executable vous-même :)
