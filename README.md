@@ -1,15 +1,17 @@
-# Projet C++ 24/25
+# Projet C++ 24/25 – "Piece Out"
 
-### Qu'est qu'il me faut pour jouer ?
+## Qu'est qu'il me faut pour jouer ?
 
-Un ordinateur moderne et une souris !
+Un ordinateur moderne, et une souris ! (mais il faut d'abord compiler la source...)
+
+Le rapport PDF se trouve dans le même dossier.
 
 ### Comment compiler le projet ?
 
 Il faut que vous avez déjà installé **GNU Make** et le compilateur **GCC**;
 n'oubliez pas de les inclure dans votre variable système `PATH`.
 
-Lorsque votre `g++` et `make` sont configurés dans votre terminal,
+Lorsque votre `g++` et `make` sont configurés dans votre terminal unix,
 changez votre répertoire courant pour le dossier du projet par la commande
 ```cd $(YOUR_DIRECTORY)/ObjetAvancee```
 et puis exécutez la commande `make` dans le terminal.
@@ -21,4 +23,4 @@ Après, vous pouvez effacer tous les fichers générés par `make clean`.
 ### Comment executer le projet ?
 
 Exécutez la commande `make test` dans le terminal depuis le dossier du projet,
-ou trouver vous-même l'executable :)
+ou trouver l'executable vous-même :)
