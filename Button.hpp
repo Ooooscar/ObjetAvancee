@@ -41,4 +41,15 @@ public:
     GameState* activate() override;
 };
 
+class ButtonLevel : public Button
+{
+private:
+    const sf::RenderWindow& window;
+    int levelIdx;
+    ButtonLevel(const sf::RenderWindow& window, int levelIdx, sf::Vector2u&& windowSize);
+public:
+    ButtonLevel(const sf::RenderWindow& window, int levelIdx);
+    GameState* activate() override;
+};
+
 #endif

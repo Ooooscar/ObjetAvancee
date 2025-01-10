@@ -80,11 +80,11 @@ void Button::onMouseDown() {
     }
 }
 void Button::updateTextPosition() {
-    sf::Vector2f textCenter{buttonText.getGlobalBounds().getSize() / 2.f};
+    sf::Vector2f textCenter{buttonText.getGlobalBounds().getSize() * 0.5f};
     sf::Vector2f textLocalBounds{textCenter + buttonText.getLocalBounds().getPosition()};
     buttonText.setOrigin(textLocalBounds);
-    sf::Vector2f rectCenter{(vertexArray[1].position.x - vertexArray[0].position.x) / 2.f,
-                            (vertexArray[2].position.y - vertexArray[0].position.y) / 2.f};
+    sf::Vector2f rectCenter{(vertexArray[1].position.x + vertexArray[0].position.x) * 0.5f,
+                            (vertexArray[2].position.y + vertexArray[0].position.y) * 0.5f};
     buttonText.setPosition(rectCenter);
 }
 
@@ -109,4 +109,28 @@ GameState* ButtonHello::activate() {
         LevelManager::getInstance().loadLevel(GameStateMachine::getContext().window, 1),
         {-1, -1}
     };
+}
+
+ButtonLevel::ButtonLevel(const sf::RenderWindow& window, int levelIdx)
+    : ButtonLevel{window, levelIdx, window.getSize()}
+{}
+ButtonLevel::ButtonLevel(const sf::RenderWindow& window, int levelIdx, sf::Vector2u&& windowSize)
+    : Button{
+        sf::Vector2f{
+            windowSize.x * (((levelIdx-1)%3+1) * 0.25f - 0.1f),
+            windowSize.y * (((levelIdx-1)/3%2+1) * 0.15f + 0.33f)
+        },
+        windowSize.x * 0.23f, windowSize.y * 0.12f,
+        "Niv. " + std::to_string(levelIdx),
+        ResourceManager::getInstance().getTextFont(), std::min(windowSize.x, windowSize.y * 3) / 36
+    }
+    , window{window}
+    , levelIdx{levelIdx}
+{}
+GameState* ButtonLevel::activate() {
+    Level* currentLevel{LevelManager::getInstance().loadLevel(GameStateMachine::getContext().window, levelIdx)};
+    if (currentLevel)
+        return new LevelStateIdle{currentLevel, {-1, -1}};
+    else
+        return new MainMenuState(); // TODO !!!
 }

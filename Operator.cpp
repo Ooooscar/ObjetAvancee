@@ -15,9 +15,9 @@ const std::array<const std::vector<sf::Vector2f>, OperatorType::Count> vertexPat
     // movement north
     std::vector<sf::Vector2f>{{0.5f, 0.12f}, {0.36f, 0.3f}, {0.64f, 0.3f}},
     // rotation clockwise
-    std::vector<sf::Vector2f>{{0.2f, 0.2f}, {0.2f, 0.8f}, {0.8f, 0.2f}, {0.8f, 0.8f}},
+    std::vector<sf::Vector2f>{{0.25f, 0.25f}, {0.25f, 0.75f}, {0.75f, 0.25f}, {0.75f, 0.75f}},
     // rotation counterclockwise
-    std::vector<sf::Vector2f>{{0.2f, 0.2f}, {0.2f, 0.8f}, {0.8f, 0.2f}, {0.8f, 0.8f}},
+    std::vector<sf::Vector2f>{{0.18f, 0.5f}, {0.5f, 0.18f}, {0.5f, 0.82f}, {0.82f, 0.5f}},
     // flip horizontal
     std::vector<sf::Vector2f>{{0.45f, 0.2f}, {0.55f, 0.2f}, {0.45f, 0.8f}, {0.55f, 0.8f}},
     // flip vertical

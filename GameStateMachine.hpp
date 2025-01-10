@@ -38,20 +38,24 @@ public:
     virtual GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos);
     virtual GameState* onMouseClick();
     virtual GameState* onMouseRelease();
+    virtual void onTick();
     virtual void render(sf::RenderWindow& window) const;
 };
 
 class MainMenuState : public GameState
 {
 protected:
+    sf::Clock animationTimer;
+    sf::Text title;
     const std::vector<Button*>* buttons;
     Button* getButtonAt(const sf::Vector2f& worldPos) const;
 public:
     MainMenuState();
-    MainMenuState(const std::vector<Button*>* buttons);
+    MainMenuState(MainMenuState&& state);
     virtual ~MainMenuState();
 
     GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
+    void onTick() override;
     void render(sf::RenderWindow& window) const override;
 };
 
@@ -60,7 +64,7 @@ class MainMenuStateButtonHover: public MainMenuState
 protected:
     Button* currentButton;
 public:
-    MainMenuStateButtonHover(const std::vector<Button*>* buttons, Button* currentButton);
+    MainMenuStateButtonHover(MainMenuState&& state, Button* currentButton);
     GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
     GameState* onMouseClick() override;
 };
@@ -70,7 +74,7 @@ class MainMenuStateButtonClicked : public MainMenuState
 protected:
     Button* currentButton;
 public:
-    MainMenuStateButtonClicked(const std::vector<Button*>* buttons, Button* currentButton);
+    MainMenuStateButtonClicked(MainMenuStateButtonHover&& state, Button* currentButton);
     GameState* onMousePositionUpdate(const sf::Vector2f& mouseWorldPos) override;
     GameState* onMouseRelease() override;
 };
