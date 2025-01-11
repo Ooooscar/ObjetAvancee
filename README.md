@@ -1,5 +1,7 @@
 # Projet C++ 24/25 – "Piece Out"
 
+Il s'agit d'un projet du cours "IFEAY050 - Langages à Objet Avancés" pour l'année universitaire 2024-2025 à l'Université Paris Cité.
+
 ## Qu'est qu'il me faut pour jouer ?
 
 Un ordinateur moderne, et une souris ! (mais il faut d'abord compiler la source...)
